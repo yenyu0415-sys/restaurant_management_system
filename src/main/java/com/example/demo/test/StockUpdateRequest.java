@@ -1,4 +1,4 @@
-package com.example.demo.stock;
+package com.example.demo.test;
 
 public class StockUpdateRequest {
 

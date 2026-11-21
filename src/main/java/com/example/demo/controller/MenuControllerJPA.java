@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static java.awt.SystemColor.menu;
-
 @RestController
 @RequestMapping("/menus")
 public class MenuControllerJPA {

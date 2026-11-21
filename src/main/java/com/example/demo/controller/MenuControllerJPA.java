@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static java.awt.SystemColor.menu;
+
 @RestController
 @RequestMapping("/menus")
 public class MenuControllerJPA {
@@ -26,5 +28,43 @@ public class MenuControllerJPA {
     @GetMapping
     public List<Menu> getAllMenus() {
         return menuServiceJPA.getAllMenus();
+
     }
+    @GetMapping("/{id}")
+    public Menu getMenuById(@PathVariable Long id){
+        return menuServiceJPA.getById(id);
+    }
+    @GetMapping("/active")
+    public List<Menu> getActiveMenus() {
+        return menuServiceJPA.getActiveMenus();
+    }
+
+
+    @PutMapping("/{id}")
+    public Menu updateMenu(
+            @PathVariable Long id,
+            @RequestBody Menu menu) {
+
+        return menuServiceJPA.updateMenu(
+                id,
+                menu.getMenuName(),
+                menu.getPrice(),
+                menu.getCategory()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteMenu(@PathVariable Long id) {
+        menuServiceJPA.deleteMenu(id);
+    }
+
+    @PatchMapping("/{id}/activate")
+    public Menu activateMenu(@PathVariable Long id) {
+      return   menuServiceJPA.activateMenu(id);
+    }
+
 }
+
+
+
+

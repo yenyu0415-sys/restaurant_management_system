@@ -1,21 +1,27 @@
 package com.example.demo.entity;
 
-
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "portfolio_menus")
+@Table(name = "menus")
 public class Menu {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "menu_id")
     private Long id;
 
+    @Column(name = "menu_name", nullable = false)
     private String menuName;
 
+    @Column(nullable = false)
     private int price;
 
+    @Column(nullable = false)
     private String category;
+
+    @Column(name = "is_active")
+    private boolean isActive = true;
 
     public Menu() {
     }
@@ -26,13 +32,12 @@ public class Menu {
         this.category = category;
     }
 
-    // Getters and Setters
-    public int getPrice() {
-        return price;
+    public Long getId() {
+        return id;
     }
 
-    public void setPrice(int price) {
-        this.price = price;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getMenuName() {
@@ -43,12 +48,12 @@ public class Menu {
         this.menuName = menuName;
     }
 
-    public Long getId() {
-        return id;
+    public int getPrice() {
+        return price;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPrice(int price) {
+        this.price = price;
     }
 
     public String getCategory() {
@@ -59,4 +64,11 @@ public class Menu {
         this.category = category;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
 }

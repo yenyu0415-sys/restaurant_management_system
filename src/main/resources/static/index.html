@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Restaurant Management System</title>
+
+    <!-- Connect CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Connect Dashboard JavaScript -->
+    <script src="js/dashboard.js" defer></script>
+</head>
+
+<body>
+
+<!-- Header -->
+<header>
+    <h1>Restaurant Management System</h1>
+    <p>Staff Management Dashboard</p>
+</header>
+
+<!-- Navigation -->
+<nav>
+    <ul>
+        <li>Dashboard</li>
+        <li>Menu</li>
+        <li>Tables</li>
+        <li>Orders</li>
+        <li>Payments</li>
+    </ul>
+</nav>
+
+<!-- Main Content -->
+<main>
+
+    <!-- Welcome Section -->
+    <section class="welcome-section">
+        <h2>Welcome to Restaurant Management System</h2>
+        <p>Manage your restaurant operations here.</p>
+    </section>
+
+    <!-- Dashboard Cards -->
+    <section class="dashboard-cards">
+
+        <!-- Total Tables Card -->
+        <div class="card">
+            <div class="card-icon table-icon" aria-hidden="true">
+                ▦
+            </div>
+
+            <h3>Total Tables</h3>
+            <p class="card-value" id="totalTables">—</p>
+            <p class="card-description">Restaurant Tables</p>
+        </div>
+
+        <!-- Active Orders Card -->
+        <div class="card">
+            <div class="card-icon order-icon" aria-hidden="true">
+                ☷
+            </div>
+
+            <h3>Active Orders</h3>
+            <p class="card-value" id="activeOrders">—</p>
+            <p class="card-description">Current Orders</p>
+        </div>
+
+        <!-- Today's Payments Card -->
+        <div class="card">
+            <div class="card-icon payment-icon" aria-hidden="true">
+                $
+            </div>
+
+            <h3>Today's Payments</h3>
+            <p class="card-value" id="todayPayments">—</p>
+            <p class="card-description">Daily Payment Summary</p>
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>

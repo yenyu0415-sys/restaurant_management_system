@@ -1,0 +1,27 @@
+
+package com.example.demo.controller;
+
+import com.example.demo.dto.DashboardResponse;
+import com.example.demo.service.DashboardService;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/dashboard")
+public class DashboardController {
+
+    private final DashboardService dashboardService;
+
+    public DashboardController(
+            DashboardService dashboardService) {
+        this.dashboardService = dashboardService;
+    }
+
+    // Dashboard 통계 조회
+    @GetMapping("/summary")
+    public DashboardResponse getDashboardSummary() {
+        return dashboardService.getDashboardSummary();
+    }
+}

@@ -1,0 +1,357 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Order Management</title>
+
+    <!-- Connect CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        .order-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .order-card {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .order-header h3 {
+            margin: 0;
+        }
+
+        .order-info {
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .order-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-preparing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .order-items {
+            border-top: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 12px 0;
+            margin-bottom: 12px;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .order-total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            color: #263547;
+        }
+
+        .order-error {
+            color: #dc3545;
+            font-weight: bold;
+            margin-top: 12px;
+        }
+
+        .order-empty {
+            color: #666;
+            padding: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Header -->
+<header>
+    <h1>Restaurant Management System</h1>
+    <p>Staff Management Dashboard</p>
+</header>
+
+<!-- Navigation -->
+<nav>
+    <ul>
+        <li><a href="/index.html">Dashboard</a></li>
+        <li><a href="/menu.html">Menu</a></li>
+        <li><a href="/tables.html">Tables</a></li>
+        <li><a href="/orders.html">Orders</a></li>
+        <li><a href="/payments.html">Payments</a></li>
+    </ul>
+</nav>
+
+<!-- Main Content -->
+<main>
+
+    <!-- Page Title -->
+    <section class="welcome-section">
+        <h2>Order Management</h2>
+        <p>Manage restaurant orders here.</p>
+    </section>
+
+    <!-- Order List -->
+    <section class="welcome-section">
+        <h2>Order List</h2>
+
+        <p id="orderCount">Loading orders...</p>
+
+        <div id="orderList">
+            Loading...
+        </div>
+
+        <p id="errorMessage"
+           class="order-error"
+           role="alert"></p>
+    </section>
+
+</main>
+
+<script>
+
+    // Format money without assuming a currency
+    function formatAmount(amount) {
+        const value = Number(amount);
+
+        if (!Number.isFinite(value)) {
+            return '0.00';
+        }
+
+        return value.toFixed(2);
+    }
+
+    // Load orders from Backend API
+    async function loadOrders() {
+
+        const orderList =
+            document.getElementById('orderList');
+
+        const orderCount =
+            document.getElementById('orderCount');
+
+        const errorMessage =
+            document.getElementById('errorMessage');
+
+        try {
+
+            const response = await fetch('/orders');
+
+            if (!response.ok) {
+                throw new Error('Failed to load order data.');
+            }
+
+            const orders = await response.json();
+
+            if (!Array.isArray(orders)) {
+                throw new Error('Invalid order data received.');
+            }
+
+            orderCount.textContent =
+                `Total Orders: ${orders.length}`;
+
+            orderList.replaceChildren();
+
+            if (orders.length === 0) {
+
+                orderList.textContent =
+                    'No orders available.';
+
+                return;
+            }
+
+            const orderGrid =
+                document.createElement('div');
+
+            orderGrid.className = 'order-grid';
+
+            orders.forEach(order => {
+
+                // Order Card
+                const card =
+                    document.createElement('div');
+
+                card.className = 'order-card';
+
+                // Order Header
+                const header =
+                    document.createElement('div');
+
+                header.className = 'order-header';
+
+                const title =
+                    document.createElement('h3');
+
+                title.textContent =
+                    `Order #${order.orderId}`;
+
+                const status =
+                    document.createElement('span');
+
+                status.className =
+                    'order-status status-' +
+                    String(order.status || '').toLowerCase();
+
+                status.textContent =
+                    order.status || 'UNKNOWN';
+
+                header.appendChild(title);
+                header.appendChild(status);
+
+                // Order Information
+                const info =
+                    document.createElement('div');
+
+                info.className = 'order-info';
+
+                const session =
+                    document.createElement('p');
+
+                session.textContent =
+                    `Session ID: ${order.sessionId}`;
+
+                const employee =
+                    document.createElement('p');
+
+                employee.textContent =
+                    `Employee ID: ${order.employeeId}`;
+
+                const orderTime =
+                    document.createElement('p');
+
+                orderTime.textContent =
+                    `Order Time: ${String(order.orderTime || '')
+                        .replace('T', ' ')}`;
+
+                info.appendChild(session);
+                info.appendChild(employee);
+                info.appendChild(orderTime);
+
+                // Order Items
+                const itemsSection =
+                    document.createElement('div');
+
+                itemsSection.className = 'order-items';
+
+                const itemsTitle =
+                    document.createElement('h4');
+
+                itemsTitle.textContent = 'Order Items';
+
+                itemsSection.appendChild(itemsTitle);
+
+                if (Array.isArray(order.items)) {
+
+                    order.items.forEach(item => {
+
+                        const itemRow =
+                            document.createElement('div');
+
+                        itemRow.className = 'order-item';
+
+                        const itemName =
+                            document.createElement('span');
+
+                        itemName.textContent =
+                            `${item.menuName} × ${item.quantity}`;
+
+                        const subtotal =
+                            document.createElement('span');
+
+                        subtotal.textContent =
+                            formatAmount(item.subtotal);
+
+                        itemRow.appendChild(itemName);
+                        itemRow.appendChild(subtotal);
+
+                        itemsSection.appendChild(itemRow);
+                    });
+
+                }
+
+                // Total Amount
+                const total =
+                    document.createElement('div');
+
+                total.className = 'order-total';
+
+                total.textContent =
+                    `Total: ${formatAmount(order.totalAmount)}`;
+
+                // Add Elements
+                card.appendChild(header);
+                card.appendChild(info);
+                card.appendChild(itemsSection);
+                card.appendChild(total);
+
+                orderGrid.appendChild(card);
+            });
+
+            orderList.appendChild(orderGrid);
+
+        } catch (error) {
+
+            console.error(
+                'Order loading error:',
+                error
+            );
+
+            orderCount.textContent =
+                'Unable to load orders.';
+
+            orderList.replaceChildren();
+
+            errorMessage.textContent =
+                'Failed to load order data. Please try again later.';
+        }
+    }
+
+    // Load orders when the page opens
+    loadOrders();
+
+</script>
+
+</body>
+</html>

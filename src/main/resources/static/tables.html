@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Table Management</title>
+
+    <!-- Connect CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<!-- Header -->
+<header>
+    <h1>Restaurant Management System</h1>
+    <p>Staff Management Dashboard</p>
+</header>
+
+<!-- Navigation -->
+<nav>
+    <ul>
+        <li><a href="/index.html">Dashboard</a></li>
+        <li><a href="/menu.html">Menu</a></li>
+        <li><a href="/tables.html">Tables</a></li>
+        <li><a href="/orders.html">Orders</a></li>
+        <li><a href="/payments.html">Payments</a></li>
+    </ul>
+</nav>
+
+<!-- Main Content -->
+<main>
+
+    <!-- Page Title -->
+    <section class="welcome-section">
+        <h2>Table Management</h2>
+        <p>Manage restaurant tables here.</p>
+    </section>
+
+    <!-- Table List -->
+    <section class="welcome-section">
+        <h2>Table List</h2>
+
+        <p id="tableCount">Loading tables...</p>
+
+        <div id="tableList">
+            Loading...
+        </div>
+
+        <p id="errorMessage" role="alert"></p>
+    </section>
+
+</main>
+
+<script>
+    async function loadTables() {
+
+        const tableList = document.getElementById('tableList');
+        const tableCount = document.getElementById('tableCount');
+        const errorMessage = document.getElementById('errorMessage');
+
+        try {
+
+            const response = await fetch('/dining-tables');
+
+            if (!response.ok) {
+                throw new Error('Failed to load table data.');
+            }
+
+            const tables = await response.json();
+
+            if (!Array.isArray(tables)) {
+                throw new Error('Invalid table data received.');
+            }
+
+            tableCount.textContent =
+                `Total Tables: ${tables.length}`;
+
+            tableList.innerHTML = '';
+
+            if (tables.length === 0) {
+                tableList.textContent = 'No tables available.';
+                return;
+            }
+
+            const tableContainer = document.createElement('div');
+
+            tableContainer.style.display = 'grid';
+            tableContainer.style.gridTemplateColumns =
+                'repeat(auto-fit, minmax(200px, 1fr))';
+            tableContainer.style.gap = '20px';
+
+            tables.forEach(table => {
+
+                const card = document.createElement('div');
+
+                card.style.backgroundColor = '#ffffff';
+                card.style.padding = '20px';
+                card.style.borderRadius = '10px';
+                card.style.boxShadow =
+                    '0 2px 8px rgba(0, 0, 0, 0.1)';
+
+                const title = document.createElement('h3');
+                title.textContent = table.tableNumber;
+
+                const capacity = document.createElement('p');
+                capacity.textContent =
+                    `Capacity: ${table.capacity} people`;
+
+                const status = document.createElement('p');
+                status.textContent = `Status: ${table.status}`;
+
+                if (table.status === 'AVAILABLE') {
+                    status.style.color = '#269b72';
+                } else if (table.status === 'OCCUPIED') {
+                    status.style.color = '#dc5a5a';
+                }
+
+                status.style.fontWeight = 'bold';
+
+                card.appendChild(title);
+                card.appendChild(capacity);
+                card.appendChild(status);
+
+                tableContainer.appendChild(card);
+            });
+
+            tableList.appendChild(tableContainer);
+
+        } catch (error) {
+
+            console.error('Table loading error:', error);
+
+            tableCount.textContent = 'Unable to load tables.';
+            tableList.textContent = '';
+            errorMessage.textContent =
+                'Failed to load table data. Please try again later.';
+        }
+    }
+
+    // Load table data when the page opens
+    loadTables();
+</script>
+
+</body>
+</html>

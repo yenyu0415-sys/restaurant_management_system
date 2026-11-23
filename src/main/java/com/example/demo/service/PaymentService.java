@@ -1,6 +1,7 @@
 
 package com.example.demo.service;
 
+import com.example.demo.dto.PaymentResponse;
 import com.example.demo.entity.Payment;
 import com.example.demo.entity.DiningSession;
 import com.example.demo.entity.DiningTable;
@@ -41,6 +42,23 @@ public class PaymentService {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.diningTableRepository = diningTableRepository;
+    }
+
+    // 전체 결제 내역 조회
+    @Transactional(readOnly = true)
+    public List<PaymentResponse> getAllPayments() {
+
+        return paymentRepository.findAll()
+                .stream()
+                .map(payment -> new PaymentResponse(
+                        payment.getPaymentId(),
+                        payment.getDiningSession().getSessionId(),
+                        payment.getAmount(),
+                        payment.getPaymentMethod(),
+                        payment.getPaymentStatus(),
+                        payment.getPaidAt()
+                ))
+                .toList();
     }
 
     // 결제 생성 및 식사 세션 종료

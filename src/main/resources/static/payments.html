@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Payment Management</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        .payment-table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #ffffff;
+        }
+
+        .payment-table th,
+        .payment-table td {
+            padding: 14px;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .payment-table th {
+            background-color: #263547;
+            color: white;
+        }
+
+        .payment-table tr:hover {
+            background-color: #f4f6f9;
+        }
+
+        .payment-status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .payment-total {
+            margin-top: 20px;
+            text-align: right;
+            font-size: 20px;
+            font-weight: bold;
+            color: #263547;
+        }
+
+        .payment-error {
+            color: #dc3545;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .payment-empty {
+            padding: 20px 0;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Restaurant Management System</h1>
+    <p>Staff Management Dashboard</p>
+</header>
+
+<nav>
+    <ul>
+        <li><a href="/index.html">Dashboard</a></li>
+        <li><a href="/menu.html">Menu</a></li>
+        <li><a href="/tables.html">Tables</a></li>
+        <li><a href="/orders.html">Orders</a></li>
+        <li><a href="/payments.html">Payments</a></li>
+    </ul>
+</nav>
+
+<main>
+
+    <section class="welcome-section">
+        <h2>Payment Management</h2>
+        <p>Manage restaurant payments here.</p>
+    </section>
+
+    <section class="welcome-section">
+
+        <h2>Payment List</h2>
+
+        <p id="paymentCount">Loading payments...</p>
+
+        <div id="paymentList">
+            Loading...
+        </div>
+
+        <p id="errorMessage"
+           class="payment-error"
+           role="alert"></p>
+
+        <div id="paymentTotal"
+             class="payment-total"></div>
+
+    </section>
+
+</main>
+
+<script>
+
+    function formatAmount(amount) {
+        const value = Number(amount);
+
+        if (!Number.isFinite(value)) {
+            return '0.00';
+        }
+
+        return value.toFixed(2);
+    }
+
+    async function loadPayments() {
+
+        const paymentList =
+            document.getElementById('paymentList');
+
+        const paymentCount =
+            document.getElementById('paymentCount');
+
+        const errorMessage =
+            document.getElementById('errorMessage');
+
+        const paymentTotal =
+            document.getElementById('paymentTotal');
+
+        try {
+
+            const response = await fetch('/payments');
+
+            if (!response.ok) {
+                throw new Error('Failed to load payment data.');
+            }
+
+            const payments = await response.json();
+
+            if (!Array.isArray(payments)) {
+                throw new Error('Invalid payment data received.');
+            }
+
+            paymentCount.textContent =
+                `Total Payments: ${payments.length}`;
+
+            paymentList.replaceChildren();
+            errorMessage.textContent = '';
+            paymentTotal.textContent = '';
+
+            if (payments.length === 0) {
+                paymentList.textContent =
+                    'No payments available.';
+
+                return;
+            }
+
+            const tableContainer =
+                document.createElement('div');
+
+            tableContainer.className =
+                'payment-table-container';
+
+            const table =
+                document.createElement('table');
+
+            table.className = 'payment-table';
+
+            const thead =
+                document.createElement('thead');
+
+            const headerRow =
+                document.createElement('tr');
+
+            const headers = [
+                'Payment ID',
+                'Session ID',
+                'Amount',
+                'Payment Method',
+                'Payment Status',
+                'Paid At'
+            ];
+
+            headers.forEach(headerText => {
+
+                const th =
+                    document.createElement('th');
+
+                th.textContent = headerText;
+
+                headerRow.appendChild(th);
+            });
+
+            thead.appendChild(headerRow);
+
+            const tbody =
+                document.createElement('tbody');
+
+            let totalAmount = 0;
+
+            payments.forEach(payment => {
+
+                const row =
+                    document.createElement('tr');
+
+                const values = [
+                    payment.paymentId,
+                    payment.sessionId,
+                    formatAmount(payment.amount),
+                    payment.paymentMethod,
+                    payment.paymentStatus,
+                    String(payment.paidAt || '').replace('T', ' ')
+                ];
+
+                values.forEach((value, index) => {
+
+                    const td =
+                        document.createElement('td');
+
+                    if (index === 4) {
+
+                        const status =
+                            document.createElement('span');
+
+                        status.className =
+                            'payment-status status-' +
+                            String(value).toLowerCase();
+
+                        status.textContent = value || 'UNKNOWN';
+
+                        td.appendChild(status);
+
+                    } else {
+
+                        td.textContent =
+                            value == null ? '-' : value;
+                    }
+
+                    row.appendChild(td);
+                });
+
+                totalAmount += Number(payment.amount) || 0;
+
+                tbody.appendChild(row);
+            });
+
+            table.appendChild(thead);
+            table.appendChild(tbody);
+
+            tableContainer.appendChild(table);
+
+            paymentList.appendChild(tableContainer);
+
+            paymentTotal.textContent =
+                `Total Amount: ${formatAmount(totalAmount)}`;
+
+        } catch (error) {
+
+            console.error(
+                'Payment loading error:',
+                error
+            );
+
+            paymentCount.textContent =
+                'Unable to load payments.';
+
+            paymentList.replaceChildren();
+
+            paymentTotal.textContent = '';
+
+            errorMessage.textContent =
+                'Failed to load payment data. Please try again later.';
+        }
+    }
+
+    // Load payment data when the page opens
+    loadPayments();
+
+</script>
+
+</body>
+</html>
+

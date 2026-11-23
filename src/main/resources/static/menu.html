@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Menu Management</title>
+
+    <!-- Connect CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Connect Menu JavaScript -->
+    <script src="/js/menu.js" defer></script>
+</head>
+
+<body>
+
+<header>
+    <h1>Restaurant Management System</h1>
+    <p>Staff Management Dashboard</p>
+</header>
+
+<nav>
+    <ul>
+        <li><a href="/index.html">Dashboard</a></li>
+        <li><a href="/menu.html">Menu</a></li>
+        <li><a href="/tables.html">Tables</a></li>
+        <li><a href="/orders.html">Orders</a></li>
+        <li><a href="/payments.html">Payments</a></li>
+    </ul>
+</nav>
+
+<main>
+
+    <section class="welcome-section">
+        <h2>Menu Management</h2>
+        <p>Manage restaurant menu items here.</p>
+    </section>
+
+    <section class="welcome-section">
+
+        <h2>Menu List</h2>
+
+        <!-- Add Menu Form -->
+        <form id="menuForm" class="menu-form">
+
+            <h3>Add New Menu</h3>
+
+            <input
+                    type="text"
+                    id="menuName"
+                    placeholder="Menu Name"
+                    required
+            >
+
+            <input
+                    type="text"
+                    id="category"
+                    placeholder="Category"
+                    required
+            >
+
+            <input
+                    type="number"
+                    id="price"
+                    placeholder="Price"
+                    min="1"
+                    required
+            >
+
+            <button type="submit">Add Menu</button>
+
+        </form>
+
+        <!-- Menu Table -->
+        <table>
+
+            <thead>
+            <tr>
+                <th>Menu Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody id="menuTableBody">
+            <!-- Menu data will be inserted here -->
+            </tbody>
+
+        </table>
+
+    </section>
+
+</main>
+
+</body>
+</html>

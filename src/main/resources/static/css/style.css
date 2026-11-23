@@ -45,10 +45,19 @@ nav ul {
 }
 
 nav li {
-    color: white;
     padding: 18px 30px;
     transition: background-color 0.3s ease;
     cursor: pointer;
+}
+
+nav a,
+nav a:link,
+nav a:visited,
+nav a:hover,
+nav a:active {
+    display: block;
+    color: white;
+    text-decoration: none;
 }
 
 nav li:hover {
@@ -97,7 +106,6 @@ main {
     background-color: white;
     padding: 25px;
     border-radius: 10px;
-
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
     transition: transform 0.3s ease,
@@ -107,7 +115,6 @@ main {
 /* Card Hover Effect */
 .dashboard-cards .card:hover {
     transform: translateY(-5px);
-
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
 }
 
@@ -125,7 +132,6 @@ main {
     border-radius: 10px;
     font-size: 25px;
     font-weight: bold;
-
     margin-bottom: 20px;
 }
 
@@ -172,6 +178,172 @@ main {
 }
 
 /* =========================
+   Menu Table
+========================= */
+.welcome-section table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+}
+
+/* Table Header */
+.welcome-section table th {
+    background-color: #f4f6f9;
+    color: #263547;
+    font-weight: 600;
+    text-align: left;
+    padding: 15px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Table Body */
+.welcome-section table td {
+    padding: 15px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #444;
+    font-size: 15px;
+}
+
+/* Row Hover */
+.welcome-section table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Last Row */
+.welcome-section table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* =========================
+   Menu Action Buttons
+========================= */
+
+/* Edit Button */
+#menuTableBody button.edit-btn {
+    background-color: #3985d6 !important;
+    color: white !important;
+    border: none !important;
+    padding: 7px 12px !important;
+    border-radius: 5px !important;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: background-color 0.2s ease;
+}
+
+#menuTableBody button.edit-btn:hover {
+    background-color: #2868b2 !important;
+}
+
+/* Activate Button */
+#menuTableBody button.activate-btn {
+    background-color: #269b72 !important;
+    color: white !important;
+    border: none !important;
+    padding: 7px 12px !important;
+    border-radius: 5px !important;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: background-color 0.2s ease;
+}
+
+#menuTableBody button.activate-btn:hover {
+    background-color: #1d7c5b !important;
+}
+
+/* Deactivate Button */
+#menuTableBody button.deactivate-btn {
+    background-color: #dc5a5a !important;
+    color: white !important;
+    border: none !important;
+    padding: 7px 12px !important;
+    border-radius: 5px !important;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: background-color 0.2s ease;
+}
+
+#menuTableBody button.deactivate-btn:hover {
+    background-color: #bd3f3f !important;
+}
+
+/* =========================
+   Menu Status Badge
+========================= */
+.status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-badge.active {
+    background-color: #e6f7ef;
+    color: #269b72;
+}
+
+.status-badge.inactive {
+    background-color: #f0f1f3;
+    color: #6b7280;
+}
+
+/* =========================
+   Add Menu Form
+========================= */
+.menu-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0 25px;
+    padding: 20px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+}
+
+.menu-form h3 {
+    width: 100%;
+    color: #263547;
+    margin-bottom: 5px;
+}
+
+.menu-form input {
+    flex: 1;
+    min-width: 150px;
+    padding: 11px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+}
+
+.menu-form input:focus {
+    border-color: #34495e;
+}
+
+.menu-form button {
+    padding: 11px 20px;
+    background-color: #34495e;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.menu-form button:hover {
+    background-color: #263547;
+}
+
+/* =========================
    Responsive Design
 ========================= */
 @media (max-width: 768px) {
@@ -194,5 +366,60 @@ main {
 
     header h1 {
         font-size: 24px;
+    }
+
+    /* Responsive Menu Table */
+    .welcome-section {
+        overflow-x: auto;
+    }
+
+    .welcome-section table {
+        min-width: 500px;
+    }
+
+    /* Responsive Add Menu Form */
+    .menu-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .menu-form input,
+    .menu-form button {
+        width: 100%;
+    }
+
+    /* =========================
+       Action Buttons - Final Fix
+    ========================= */
+    .edit-btn,
+    .activate-btn,
+    .deactivate-btn {
+        display: inline-block !important;
+        padding: 7px 14px !important;
+        border: none !important;
+        border-radius: 5px !important;
+        color: white !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        margin-right: 5px !important;
+    }
+
+    .edit-btn {
+        background-color: #3985d6 !important;
+    }
+
+    .activate-btn {
+        background-color: #269b72 !important;
+    }
+
+    .deactivate-btn {
+        background-color: #dc5a5a !important;
+    }
+
+    .edit-btn:hover,
+    .activate-btn:hover,
+    .deactivate-btn:hover {
+        opacity: 0.8 !important;
     }
 }

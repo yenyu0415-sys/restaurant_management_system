@@ -15,4 +15,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // 주문 상태별 개수 조회
     long countByStatus(OrderStatus status);
+
+    // 특정 식사 세션에 미처리 주문이 있는지 확인
+    boolean existsByDiningSession_SessionIdAndStatusIn(
+            Long sessionId,
+            List<OrderStatus> statuses
+    );
 }

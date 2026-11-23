@@ -3,6 +3,7 @@ package com.example.demo.service;
 
 import com.example.demo.entity.Order;
 import com.example.demo.entity.OrderItem;
+import com.example.demo.entity.OrderStatus;
 
 import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
@@ -51,9 +52,12 @@ public class OrderItemService {
         orderItemRepository.delete(orderItem);
     }
 
-    // 특정 식사 세션의 누적 주문 금액 조회
+    // 특정 식사 세션의 취소되지 않은 주문 금액 조회
     public BigDecimal getTotalAmount(Long sessionId) {
-        return orderItemRepository.calculateTotalAmount(sessionId);
+        return orderItemRepository.calculateTotalAmount(
+                sessionId,
+                OrderStatus.CANCELLED
+        );
     }
 
     // DB에서 실제 Order 조회
@@ -65,4 +69,3 @@ public class OrderItemService {
                                 "Order not found: " + orderId));
     }
 }
-

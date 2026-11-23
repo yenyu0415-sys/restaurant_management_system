@@ -1,11 +1,14 @@
+
 package com.example.demo;
 
 import com.example.demo.entity.DiningSessionStatus;
+import com.example.demo.entity.OrderStatus;
 import com.example.demo.entity.Payment;
 import com.example.demo.entity.DiningSession;
 import com.example.demo.entity.DiningTable;
 
 import com.example.demo.repository.OrderItemRepository;
+import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.PaymentRepository;
 import com.example.demo.repository.DiningSessionRepository;
 import com.example.demo.repository.DiningTableRepository;
@@ -20,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,6 +39,9 @@ class PaymentServiceTest {
     private DiningSessionRepository diningSessionRepository;
 
     @Mock
+    private OrderRepository orderRepository;
+
+    @Mock
     private OrderItemRepository orderItemRepository;
 
     @Mock
@@ -42,7 +49,6 @@ class PaymentServiceTest {
 
     @InjectMocks
     private PaymentService paymentService;
-
 
     // 1. 결제 성공
     @Test
@@ -62,14 +68,25 @@ class PaymentServiceTest {
         when(paymentRepository.existsByDiningSession(session))
                 .thenReturn(false);
 
-        when(orderItemRepository.calculateTotalAmount(1L))
-                .thenReturn(new BigDecimal("250.00"));
+        when(orderRepository
+                .existsByDiningSession_SessionIdAndStatusIn(
+                        1L,
+                        List.of(
+                                OrderStatus.PENDING,
+                                OrderStatus.PREPARING
+                        )))
+                .thenReturn(false);
 
-        when(paymentRepository.saveAndFlush(any(Payment.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(orderItemRepository.calculateTotalAmount(
+                1L,
+                OrderStatus.CANCELLED
+        )).thenReturn(new BigDecimal("250.00"));
 
         when(diningTableRepository.findById(1L))
                 .thenReturn(Optional.of(table));
+
+        when(paymentRepository.saveAndFlush(any(Payment.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
         Payment result = paymentService.createPayment(1L, "CASH");
 
@@ -89,7 +106,6 @@ class PaymentServiceTest {
         verify(paymentRepository, times(1))
                 .saveAndFlush(any(Payment.class));
     }
-
 
     // 2. 식사 세션이 존재하지 않는 경우
     @Test
@@ -111,7 +127,6 @@ class PaymentServiceTest {
         verify(paymentRepository, never())
                 .saveAndFlush(any(Payment.class));
     }
-
 
     // 3. 식사 세션이 ACTIVE 상태가 아닌 경우
     @Test
@@ -137,7 +152,6 @@ class PaymentServiceTest {
         verify(paymentRepository, never())
                 .saveAndFlush(any(Payment.class));
     }
-
 
     // 4. 이미 결제가 존재하는 경우
     @Test
@@ -167,9 +181,11 @@ class PaymentServiceTest {
                 .saveAndFlush(any(Payment.class));
 
         verify(orderItemRepository, never())
-                .calculateTotalAmount(1L);
+                .calculateTotalAmount(
+                        anyLong(),
+                        any(OrderStatus.class)
+                );
     }
-
 
     // 5. 잘못된 결제 수단인 경우
     @Test
@@ -199,9 +215,11 @@ class PaymentServiceTest {
                 .saveAndFlush(any(Payment.class));
 
         verify(orderItemRepository, never())
-                .calculateTotalAmount(1L);
+                .calculateTotalAmount(
+                        anyLong(),
+                        any(OrderStatus.class)
+                );
     }
-
 
     // 6. 결제 금액이 0인 경우
     @Test
@@ -217,8 +235,10 @@ class PaymentServiceTest {
         when(paymentRepository.existsByDiningSession(session))
                 .thenReturn(false);
 
-        when(orderItemRepository.calculateTotalAmount(1L))
-                .thenReturn(BigDecimal.ZERO);
+        when(orderItemRepository.calculateTotalAmount(
+                1L,
+                OrderStatus.CANCELLED
+        )).thenReturn(BigDecimal.ZERO);
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
@@ -233,7 +253,6 @@ class PaymentServiceTest {
         verify(paymentRepository, never())
                 .saveAndFlush(any(Payment.class));
     }
-
 
     // 7. 결제 금액이 null인 경우
     @Test
@@ -249,8 +268,10 @@ class PaymentServiceTest {
         when(paymentRepository.existsByDiningSession(session))
                 .thenReturn(false);
 
-        when(orderItemRepository.calculateTotalAmount(1L))
-                .thenReturn(null);
+        when(orderItemRepository.calculateTotalAmount(
+                1L,
+                OrderStatus.CANCELLED
+        )).thenReturn(null);
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
@@ -265,7 +286,6 @@ class PaymentServiceTest {
         verify(paymentRepository, never())
                 .saveAndFlush(any(Payment.class));
     }
-
 
     // 8. DiningTable이 존재하지 않는 경우
     @Test
@@ -282,11 +302,10 @@ class PaymentServiceTest {
         when(paymentRepository.existsByDiningSession(session))
                 .thenReturn(false);
 
-        when(orderItemRepository.calculateTotalAmount(1L))
-                .thenReturn(new BigDecimal("250.00"));
-
-        when(paymentRepository.saveAndFlush(any(Payment.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(orderItemRepository.calculateTotalAmount(
+                1L,
+                OrderStatus.CANCELLED
+        )).thenReturn(new BigDecimal("250.00"));
 
         when(diningTableRepository.findById(1L))
                 .thenReturn(Optional.empty());
@@ -301,10 +320,9 @@ class PaymentServiceTest {
                 exception.getMessage()
         );
 
-        verify(paymentRepository, times(1))
+        verify(paymentRepository, never())
                 .saveAndFlush(any(Payment.class));
     }
-
 
     // 9. DiningTable이 OCCUPIED 상태가 아닌 경우
     @Test
@@ -324,11 +342,10 @@ class PaymentServiceTest {
         when(paymentRepository.existsByDiningSession(session))
                 .thenReturn(false);
 
-        when(orderItemRepository.calculateTotalAmount(1L))
-                .thenReturn(new BigDecimal("250.00"));
-
-        when(paymentRepository.saveAndFlush(any(Payment.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(orderItemRepository.calculateTotalAmount(
+                1L,
+                OrderStatus.CANCELLED
+        )).thenReturn(new BigDecimal("250.00"));
 
         when(diningTableRepository.findById(1L))
                 .thenReturn(Optional.of(table));
@@ -343,7 +360,7 @@ class PaymentServiceTest {
                 exception.getMessage()
         );
 
-        verify(paymentRepository, times(1))
+        verify(paymentRepository, never())
                 .saveAndFlush(any(Payment.class));
 
         assertEquals("AVAILABLE", table.getStatus());
@@ -363,8 +380,10 @@ class PaymentServiceTest {
         when(paymentRepository.existsByDiningSession(session))
                 .thenReturn(false);
 
-        when(orderItemRepository.calculateTotalAmount(1L))
-                .thenReturn(new BigDecimal("-100.00"));
+        when(orderItemRepository.calculateTotalAmount(
+                1L,
+                OrderStatus.CANCELLED
+        )).thenReturn(new BigDecimal("-100.00"));
 
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
@@ -405,7 +424,10 @@ class PaymentServiceTest {
         );
 
         verify(orderItemRepository, never())
-                .calculateTotalAmount(1L);
+                .calculateTotalAmount(
+                        anyLong(),
+                        any(OrderStatus.class)
+                );
 
         verify(paymentRepository, never())
                 .saveAndFlush(any(Payment.class));
@@ -436,7 +458,96 @@ class PaymentServiceTest {
         );
 
         verify(orderItemRepository, never())
-                .calculateTotalAmount(1L);
+                .calculateTotalAmount(
+                        anyLong(),
+                        any(OrderStatus.class)
+                );
+
+        verify(paymentRepository, never())
+                .saveAndFlush(any(Payment.class));
+    }
+
+    // 13. PENDING 주문이 있으면 결제를 차단하는 경우
+    @Test
+    void createPayment_pendingOrdersExist() {
+
+        DiningSession session = new DiningSession();
+        session.setSessionId(1L);
+        session.setStatus(DiningSessionStatus.ACTIVE);
+
+        when(diningSessionRepository.findById(1L))
+                .thenReturn(Optional.of(session));
+
+        when(paymentRepository.existsByDiningSession(session))
+                .thenReturn(false);
+
+        when(orderRepository
+                .existsByDiningSession_SessionIdAndStatusIn(
+                        1L,
+                        List.of(
+                                OrderStatus.PENDING,
+                                OrderStatus.PREPARING
+                        )))
+                .thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> paymentService.createPayment(1L, "CASH")
+        );
+
+        assertEquals(
+                "Unfinished orders exist. Please check the orders before payment.",
+                exception.getMessage()
+        );
+
+        verify(orderItemRepository, never())
+                .calculateTotalAmount(
+                        anyLong(),
+                        any(OrderStatus.class)
+                );
+
+        verify(paymentRepository, never())
+                .saveAndFlush(any(Payment.class));
+    }
+
+    // 14. PREPARING 주문이 있으면 결제를 차단하는 경우
+    @Test
+    void createPayment_preparingOrdersExist() {
+
+        DiningSession session = new DiningSession();
+        session.setSessionId(1L);
+        session.setStatus(DiningSessionStatus.ACTIVE);
+
+        when(diningSessionRepository.findById(1L))
+                .thenReturn(Optional.of(session));
+
+        when(paymentRepository.existsByDiningSession(session))
+                .thenReturn(false);
+
+        when(orderRepository
+                .existsByDiningSession_SessionIdAndStatusIn(
+                        1L,
+                        List.of(
+                                OrderStatus.PENDING,
+                                OrderStatus.PREPARING
+                        )))
+                .thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> paymentService.createPayment(1L, "CASH")
+        );
+
+        assertEquals(
+                "Unfinished orders exist. Please check the orders before payment.",
+                exception.getMessage()
+        );
+
+        verify(orderItemRepository, never())
+                .calculateTotalAmount(
+                        anyLong(),
+                        any(OrderStatus.class)
+                );
 
         verify(paymentRepository, never())
                 .saveAndFlush(any(Payment.class));

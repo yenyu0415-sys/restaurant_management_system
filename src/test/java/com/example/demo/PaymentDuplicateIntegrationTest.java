@@ -1,3 +1,4 @@
+
 package com.example.demo;
 
 import com.example.demo.entity.*;
@@ -43,7 +44,6 @@ class PaymentDuplicateIntegrationTest {
     @Autowired
     private PaymentRepository paymentRepository;
 
-
     @Test
     void shouldPreventDuplicatePayment() {
 
@@ -58,7 +58,6 @@ class PaymentDuplicateIntegrationTest {
         DiningTable savedTable =
                 diningTableRepository.saveAndFlush(table);
 
-
         // 2. DiningSession 생성
         DiningSession session = new DiningSession();
 
@@ -68,7 +67,6 @@ class PaymentDuplicateIntegrationTest {
 
         DiningSession savedSession =
                 diningSessionRepository.saveAndFlush(session);
-
 
         // 3. Employee 생성
         Employee employee = new Employee();
@@ -82,7 +80,6 @@ class PaymentDuplicateIntegrationTest {
         Employee savedEmployee =
                 employeeRepository.saveAndFlush(employee);
 
-
         // 4. Menu 생성
         Menu menu =
                 new Menu("Duplicate Noodle", 250, "NOODLE");
@@ -90,17 +87,17 @@ class PaymentDuplicateIntegrationTest {
         Menu savedMenu =
                 menuRepository.saveAndFlush(menu);
 
-
         // 5. Order 생성
         Order order = new Order(LocalDateTime.now());
 
         order.setDiningSession(savedSession);
         order.setEmployee(savedEmployee);
-        order.setStatus(OrderStatus.PENDING);
+
+        // 결제 가능한 주문 상태
+        order.setStatus(OrderStatus.COMPLETED);
 
         Order savedOrder =
                 orderRepository.saveAndFlush(order);
-
 
         // 6. OrderItem 생성
         OrderItem orderItem = new OrderItem();
@@ -112,7 +109,6 @@ class PaymentDuplicateIntegrationTest {
 
         orderItemRepository.saveAndFlush(orderItem);
 
-
         // 7. 첫 번째 결제
         Payment firstPayment =
                 paymentService.createPayment(
@@ -121,7 +117,6 @@ class PaymentDuplicateIntegrationTest {
                 );
 
         assertNotNull(firstPayment.getPaymentId());
-
 
         // 8. 두 번째 결제는 예외 발생 예상
         IllegalArgumentException exception = assertThrows(
@@ -136,7 +131,6 @@ class PaymentDuplicateIntegrationTest {
                 "Payment already exists",
                 exception.getMessage()
         );
-
 
         // 9. Payment가 한 건만 존재하는지 확인
         assertTrue(

@@ -1,3 +1,4 @@
+
 package com.example.demo;
 
 import com.example.demo.entity.*;
@@ -43,7 +44,6 @@ class PaymentSuccessIntegrationTest {
     @Autowired
     private PaymentRepository paymentRepository;
 
-
     @Test
     void shouldCompletePaymentSuccessfully() {
 
@@ -58,7 +58,6 @@ class PaymentSuccessIntegrationTest {
         DiningTable savedTable =
                 diningTableRepository.saveAndFlush(table);
 
-
         // 2. DiningSession 생성
         DiningSession session = new DiningSession();
 
@@ -68,7 +67,6 @@ class PaymentSuccessIntegrationTest {
 
         DiningSession savedSession =
                 diningSessionRepository.saveAndFlush(session);
-
 
         // 3. Employee 생성
         Employee employee = new Employee();
@@ -82,7 +80,6 @@ class PaymentSuccessIntegrationTest {
         Employee savedEmployee =
                 employeeRepository.saveAndFlush(employee);
 
-
         // 4. Menu 생성
         Menu menu =
                 new Menu("Success Noodle", 250, "NOODLE");
@@ -90,17 +87,17 @@ class PaymentSuccessIntegrationTest {
         Menu savedMenu =
                 menuRepository.saveAndFlush(menu);
 
-
         // 5. Order 생성
         Order order = new Order(LocalDateTime.now());
 
         order.setDiningSession(savedSession);
         order.setEmployee(savedEmployee);
-        order.setStatus(OrderStatus.PENDING);
+
+        // 모든 주문 처리가 완료된 상태
+        order.setStatus(OrderStatus.COMPLETED);
 
         Order savedOrder =
                 orderRepository.saveAndFlush(order);
-
 
         // 6. OrderItem 생성
         OrderItem orderItem = new OrderItem();
@@ -112,14 +109,12 @@ class PaymentSuccessIntegrationTest {
 
         orderItemRepository.saveAndFlush(orderItem);
 
-
         // 7. 정상 결제 실행
         Payment payment =
                 paymentService.createPayment(
                         savedSession.getSessionId(),
                         "CASH"
                 );
-
 
         // 8. Payment 검증
         assertNotNull(payment.getPaymentId());
@@ -130,9 +125,7 @@ class PaymentSuccessIntegrationTest {
         );
 
         assertEquals("CASH", payment.getPaymentMethod());
-
         assertEquals("COMPLETED", payment.getPaymentStatus());
-
 
         // 9. DiningSession 검증
         DiningSession foundSession =
@@ -147,7 +140,6 @@ class PaymentSuccessIntegrationTest {
 
         assertNotNull(foundSession.getEndedAt());
 
-
         // 10. DiningTable 검증
         DiningTable foundTable =
                 diningTableRepository.findById(
@@ -155,7 +147,6 @@ class PaymentSuccessIntegrationTest {
                 ).orElseThrow();
 
         assertEquals("AVAILABLE", foundTable.getStatus());
-
 
         // 11. Payment DB 저장 확인
         assertTrue(
@@ -173,7 +164,6 @@ class PaymentSuccessIntegrationTest {
         );
 
         assertEquals("CASH", foundPayment.getPaymentMethod());
-
         assertEquals("COMPLETED", foundPayment.getPaymentStatus());
 
         assertNotNull(foundPayment.getPaidAt());

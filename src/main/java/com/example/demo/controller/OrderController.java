@@ -1,3 +1,4 @@
+
 package com.example.demo.controller;
 
 import com.example.demo.dto.CreateOrderRequest;
@@ -50,6 +51,12 @@ public class OrderController {
             @RequestParam OrderStatus status) {
 
         return orderService.updateOrderStatus(id, status);
+    }
+
+    // 주문 취소
+    @PatchMapping("/{id}/cancel")
+    public Order cancelOrder(@PathVariable Long id) {
+        return orderService.cancelOrder(id);
     }
 
     // 세션 ID로 주문 조회

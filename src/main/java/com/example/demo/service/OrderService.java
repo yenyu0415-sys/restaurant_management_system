@@ -1,3 +1,4 @@
+
 package com.example.demo.service;
 
 import com.example.demo.dto.CreateOrderRequest;
@@ -45,12 +46,12 @@ public class OrderService {
         this.menuRepositoryJPA = menuRepositoryJPA;
     }
 
-    // 주문 저장
+    // Save Order
     public Order saveOrder(Order order) {
         return orderRepository.save(order);
     }
 
-    // 모든 주문 조회
+    // Get All Orders
     @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrders() {
 
@@ -60,7 +61,7 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    // ID로 특정 주문 조회
+    // Get Order By ID
     @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long id) {
 
@@ -69,7 +70,7 @@ public class OrderService {
         return convertToOrderResponse(order);
     }
 
-    // 내부 주문 Entity 조회
+    // Find Order Entity By ID
     private Order getOrderEntityById(Long id) {
 
         return orderRepository.findById(id)
@@ -77,7 +78,7 @@ public class OrderService {
                         new RuntimeException("Order not found: " + id));
     }
 
-    // 세션 ID로 주문 조회
+    // Get Orders By Dining Session ID
     @Transactional(readOnly = true)
     public List<OrderResponse> getOrdersBySessionId(Long sessionId) {
 
@@ -88,7 +89,7 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    // Order Entity를 OrderResponse DTO로 변환
+    // Convert Order Entity To Response DTO
     private OrderResponse convertToOrderResponse(Order order) {
 
         List<OrderItem> orderItems =
@@ -131,7 +132,8 @@ public class OrderService {
         );
     }
 
-    // 주문 삭제
+    // Delete Order
+    // Physical deletion - not used for normal cancellation
     public void deleteOrder(Long id) {
 
         Order order = getOrderEntityById(id);
@@ -139,7 +141,7 @@ public class OrderService {
         orderRepository.delete(order);
     }
 
-    // 주문 생성
+    // Create Order
     @Transactional
     public Order createOrder(CreateOrderRequest request) {
 
@@ -150,14 +152,14 @@ public class OrderService {
                     "Order items cannot be empty");
         }
 
-        // 식사 세션 조회
+        // Find Dining Session
         DiningSession diningSession =
                 diningSessionRepository.findById(request.getSessionId())
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Dining session not found"));
 
-        // 활성 세션 확인
+        // Check Active Session
         if (diningSession.getStatus()
                 != DiningSessionStatus.ACTIVE) {
 
@@ -165,21 +167,21 @@ public class OrderService {
                     "Dining session is not active");
         }
 
-        // 직원 조회
+        // Find Employee
         Employee employee =
                 employeeRepository.findById(request.getEmployeeId())
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Employee not found"));
 
-        // 직원 활성 상태 확인
+        // Check Active Employee
         if (!employee.isActive()) {
 
             throw new IllegalArgumentException(
                     "Employee is inactive");
         }
 
-        // 주문 생성
+        // Create Order
         Order order = new Order(LocalDateTime.now());
 
         order.setDiningSession(diningSession);
@@ -188,12 +190,12 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        // 주문 항목 생성
+        // Create Order Items
         List<OrderItem> orderItems = new ArrayList<>();
 
         for (OrderItemRequest itemRequest : request.getItems()) {
 
-            // 수량 검증
+            // Validate Quantity
             if (itemRequest.getQuantity() == null
                     || itemRequest.getQuantity() <= 0) {
 
@@ -201,40 +203,62 @@ public class OrderService {
                         "Quantity must be greater than zero");
             }
 
-            // 메뉴 조회
+            // Find Menu
             Menu menu = menuRepositoryJPA
                     .findById(itemRequest.getMenuId())
                     .orElseThrow(() ->
                             new RuntimeException("Menu not found"));
 
-            // 메뉴 활성 상태 확인
+            // Check Active Menu
             if (!menu.isActive()) {
 
                 throw new IllegalArgumentException(
                         "Menu is inactive: " + menu.getMenuName());
             }
 
-            // 주문 상세 생성
+            // Create Order Item
             OrderItem orderItem = new OrderItem();
 
             orderItem.setOrder(savedOrder);
             orderItem.setMenu(menu);
             orderItem.setQuantity(itemRequest.getQuantity());
 
-            // 주문 당시 메뉴 가격 저장
+            // Save Menu Price At Order Time
             orderItem.setUnitPrice(
                     BigDecimal.valueOf(menu.getPrice()));
 
             orderItems.add(orderItem);
         }
 
-        // 주문 상세 일괄 저장
+        // Save All Order Items
         orderItemRepository.saveAll(orderItems);
 
         return savedOrder;
     }
 
-    // 주문 상태 변경
+    // Cancel Order
+    @Transactional
+    public Order cancelOrder(Long id) {
+
+        Order order = getOrderEntityById(id);
+
+        OrderStatus currentStatus = order.getStatus();
+
+        // Only PENDING and PREPARING orders can be cancelled
+        if (currentStatus != OrderStatus.PENDING
+                && currentStatus != OrderStatus.PREPARING) {
+
+            throw new IllegalArgumentException(
+                    "Only PENDING or PREPARING orders can be cancelled");
+        }
+
+        // Change status instead of deleting the order
+        order.setStatus(OrderStatus.CANCELLED);
+
+        return orderRepository.save(order);
+    }
+
+    // Update Order Status
     @Transactional
     public Order updateOrderStatus(Long id, OrderStatus status) {
 
@@ -266,7 +290,7 @@ public class OrderService {
                         "PREPARING can only change to COMPLETED");
             }
 
-            // 완료 또는 취소 상태에서는 변경 불가
+            // Completed or Cancelled orders cannot be changed
         } else {
 
             throw new IllegalArgumentException(
@@ -278,4 +302,3 @@ public class OrderService {
         return orderRepository.save(order);
     }
 }
-

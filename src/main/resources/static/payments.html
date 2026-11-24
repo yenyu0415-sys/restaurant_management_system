@@ -7,18 +7,90 @@
 
     <title>Payment Management</title>
 
-    <!-- Common CSS -->
-    <link rel="stylesheet" href="/css/style.css?v=6">
+    <link rel="stylesheet" href="/css/style.css?v=7">
+
+    <style>
+        /* =========================
+           Payment Registration
+        ========================= */
+
+        .payment-form {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: end;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .payment-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .payment-form-group label {
+            font-weight: bold;
+            color: #263547;
+        }
+
+        .payment-form-group input,
+        .payment-form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .payment-submit-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            background-color: #e68a27;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .payment-submit-button:hover {
+            background-color: #cf7418;
+        }
+
+        .payment-submit-button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        .payment-message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .payment-message.success {
+            color: #218838;
+        }
+
+        .payment-message.error {
+            color: #dc3545;
+        }
+
+        .session-info {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #263547;
+        }
+    </style>
 </head>
 
 <body>
 
-<!-- Header -->
 <header>
     <h1>Restaurant Management System</h1>
     <p>Staff Management Dashboard</p>
 
-    <!-- Navigation -->
     <nav>
         <a href="/index.html">Dashboard</a>
         <a href="/menu.html">Menu</a>
@@ -28,13 +100,65 @@
     </nav>
 </header>
 
-<!-- Main Content -->
 <main>
 
     <!-- Page Header -->
     <section class="welcome-section">
         <h2>Payment Management</h2>
         <p>Manage restaurant payments here.</p>
+    </section>
+
+    <!-- Payment Registration -->
+    <section class="welcome-section">
+
+        <h2>Register Payment</h2>
+
+        <p>Select an occupied table and a payment method.</p>
+
+        <form id="paymentForm" class="payment-form">
+
+            <div class="payment-form-group">
+                <label for="tableId">Table Number</label>
+
+                <select id="tableId" name="tableId" required>
+                    <option value="">Loading tables...</option>
+                </select>
+            </div>
+
+            <div class="payment-form-group">
+                <label for="paymentMethod">Payment Method</label>
+
+                <select
+                        id="paymentMethod"
+                        name="paymentMethod"
+                        required
+                >
+                    <option value="">Select Payment Method</option>
+                    <option value="CASH">Cash</option>
+                    <option value="CARD">Card</option>
+                    <option value="MOBILE_PAY">Mobile Pay</option>
+                </select>
+            </div>
+
+            <button
+                    type="submit"
+                    id="paymentSubmitButton"
+                    class="payment-submit-button"
+                    disabled
+            >
+                Complete Payment
+            </button>
+
+        </form>
+
+        <p id="sessionInfo" class="session-info"></p>
+
+        <p
+                id="paymentMessage"
+                class="payment-message"
+                role="alert"
+        ></p>
+
     </section>
 
     <!-- Payment List -->
@@ -48,21 +172,103 @@
             Loading...
         </div>
 
-        <p id="errorMessage"
-           class="payment-error"
-           role="alert"></p>
+        <p
+                id="errorMessage"
+                class="payment-error"
+                role="alert"
+        ></p>
 
-        <div id="paymentTotal"
-             class="payment-total"></div>
+        <div
+                id="paymentTotal"
+                class="payment-total"
+        ></div>
 
     </section>
 
 </main>
 
-<!-- JavaScript -->
+<!-- Payment Details Modal -->
+<div
+        id="paymentModal"
+        class="payment-modal"
+        aria-hidden="true"
+>
+
+    <div
+            class="payment-modal-content"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modalTitle"
+    >
+
+        <div class="payment-modal-header">
+
+            <h2 id="modalTitle">Payment Details</h2>
+
+            <button
+                    type="button"
+                    id="closeModalButton"
+                    class="payment-modal-close"
+                    aria-label="Close"
+            >
+                &times;
+            </button>
+
+        </div>
+
+        <div class="payment-detail-list">
+
+            <div class="payment-detail-row">
+                <span>Payment ID</span>
+                <strong id="detailPaymentId">-</strong>
+            </div>
+
+            <div class="payment-detail-row">
+                <span>Session ID</span>
+                <strong id="detailSessionId">-</strong>
+            </div>
+
+            <div class="payment-detail-row">
+                <span>Amount</span>
+                <strong id="detailAmount">-</strong>
+            </div>
+
+            <div class="payment-detail-row">
+                <span>Payment Method</span>
+                <strong id="detailMethod">-</strong>
+            </div>
+
+            <div class="payment-detail-row">
+                <span>Payment Status</span>
+                <strong id="detailStatus">-</strong>
+            </div>
+
+            <div class="payment-detail-row">
+                <span>Paid At</span>
+                <strong id="detailPaidAt">-</strong>
+            </div>
+
+        </div>
+
+        <button
+                type="button"
+                id="closeDetailsButton"
+                class="payment-modal-action"
+        >
+            Close
+        </button>
+
+    </div>
+</div>
+
 <script>
 
+    // =========================
+    // Format Amount
+    // =========================
+
     function formatAmount(amount) {
+
         const value = Number(amount);
 
         if (!Number.isFinite(value)) {
@@ -71,6 +277,405 @@
 
         return value.toFixed(2);
     }
+
+
+    // =========================
+    // Elements
+    // =========================
+
+    const paymentForm =
+        document.getElementById('paymentForm');
+
+    const tableSelect =
+        document.getElementById('tableId');
+
+    const paymentMethodSelect =
+        document.getElementById('paymentMethod');
+
+    const paymentMessage =
+        document.getElementById('paymentMessage');
+
+    const sessionInfo =
+        document.getElementById('sessionInfo');
+
+    const paymentSubmitButton =
+        document.getElementById('paymentSubmitButton');
+
+    let selectedSessionId = null;
+
+
+    // =========================
+    // Load Occupied Tables
+    // =========================
+
+    async function loadOccupiedTables() {
+
+        tableSelect.replaceChildren();
+
+        const defaultOption =
+            document.createElement('option');
+
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select Table';
+
+        tableSelect.appendChild(defaultOption);
+
+        try {
+
+            const response = await fetch('/dining-tables');
+
+            if (!response.ok) {
+                throw new Error('Failed to load tables.');
+            }
+
+            const tables = await response.json();
+
+            if (!Array.isArray(tables)) {
+                throw new Error('Invalid table data.');
+            }
+
+            const occupiedTables = tables.filter(table =>
+                table.status === 'OCCUPIED'
+            );
+
+            occupiedTables.forEach(table => {
+
+                const option =
+                    document.createElement('option');
+
+                option.value = table.tableId;
+
+                option.textContent =
+                    `${table.tableNumber} - ${table.status}`;
+
+                tableSelect.appendChild(option);
+
+            });
+
+            if (occupiedTables.length === 0) {
+
+                defaultOption.textContent =
+                    'No occupied tables available';
+
+            }
+
+        } catch (error) {
+
+            console.error('Table loading error:', error);
+
+            defaultOption.textContent =
+                'Failed to load tables';
+
+            showPaymentMessage(
+                'Failed to load table information.',
+                'error'
+            );
+        }
+    }
+
+
+    // =========================
+    // Find Active Session
+    // =========================
+
+    tableSelect.addEventListener('change', async function() {
+
+        const tableId = tableSelect.value;
+
+        selectedSessionId = null;
+
+        sessionInfo.textContent = '';
+
+        paymentSubmitButton.disabled = true;
+
+        paymentMessage.textContent = '';
+        paymentMessage.className = 'payment-message';
+
+        if (!tableId) {
+            return;
+        }
+
+        tableSelect.disabled = true;
+
+        sessionInfo.textContent =
+            'Finding active session...';
+
+        try {
+
+            const response = await fetch(
+                `/dining-sessions/active/table/${encodeURIComponent(tableId)}`
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    'No active session found for this table.'
+                );
+            }
+
+            const session = await response.json();
+
+            if (
+                session.status !== 'ACTIVE' ||
+                Number(session.tableId) !== Number(tableId)
+            ) {
+                throw new Error(
+                    'The active session information is invalid.'
+                );
+            }
+
+            selectedSessionId = session.sessionId;
+
+            sessionInfo.textContent =
+                `Active Session ID: ${selectedSessionId}`;
+
+            paymentSubmitButton.disabled = false;
+
+        } catch (error) {
+
+            console.error('Session lookup error:', error);
+
+            selectedSessionId = null;
+
+            sessionInfo.textContent = '';
+
+            showPaymentMessage(
+                error.message,
+                'error'
+            );
+
+        } finally {
+
+            tableSelect.disabled = false;
+        }
+
+    });
+
+
+    // =========================
+    // Payment Registration
+    // =========================
+
+    paymentForm.addEventListener('submit', async function(event) {
+
+        event.preventDefault();
+
+        const tableId = tableSelect.value;
+
+        const paymentMethod =
+            paymentMethodSelect.value;
+
+        if (!tableId || !selectedSessionId) {
+
+            showPaymentMessage(
+                'Please select a table with an active session.',
+                'error'
+            );
+
+            return;
+        }
+
+        if (!paymentMethod) {
+
+            showPaymentMessage(
+                'Please select a payment method.',
+                'error'
+            );
+
+            return;
+        }
+
+        const selectedTable =
+            tableSelect.options[tableSelect.selectedIndex].text;
+
+        const confirmed = confirm(
+            `Complete payment for ${selectedTable}?\n` +
+            `Session ID: ${selectedSessionId}\n` +
+            `Payment Method: ${paymentMethod}`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        paymentSubmitButton.disabled = true;
+
+        paymentSubmitButton.textContent = 'Processing...';
+
+        tableSelect.disabled = true;
+        paymentMethodSelect.disabled = true;
+
+        paymentMessage.textContent = '';
+        paymentMessage.className = 'payment-message';
+
+        try {
+
+            const response = await fetch(
+                `/payments?sessionId=${encodeURIComponent(selectedSessionId)}&paymentMethod=${encodeURIComponent(paymentMethod)}`,
+                {
+                    method: 'POST'
+                }
+            );
+
+            if (!response.ok) {
+
+                let errorText =
+                    'Payment failed. Please check the session and order status.';
+
+                try {
+
+                    const errorData = await response.json();
+
+                    if (errorData.message) {
+                        errorText = errorData.message;
+                    }
+
+                } catch (error) {
+                    // Keep default error message.
+                }
+
+                throw new Error(errorText);
+            }
+
+            showPaymentMessage(
+                'Payment completed successfully!',
+                'success'
+            );
+
+            paymentForm.reset();
+
+            selectedSessionId = null;
+
+            sessionInfo.textContent = '';
+
+            await loadPayments();
+
+            await loadOccupiedTables();
+
+        } catch (error) {
+
+            console.error(
+                'Payment registration error:',
+                error
+            );
+
+            showPaymentMessage(
+                error.message || 'Failed to complete payment.',
+                'error'
+            );
+
+        } finally {
+
+            tableSelect.disabled = false;
+            paymentMethodSelect.disabled = false;
+
+            paymentSubmitButton.disabled =
+                !selectedSessionId;
+
+            paymentSubmitButton.textContent =
+                'Complete Payment';
+        }
+
+    });
+
+
+    function showPaymentMessage(message, type) {
+
+        paymentMessage.textContent = message;
+
+        paymentMessage.className =
+            'payment-message ' + type;
+    }
+
+
+    // =========================
+    // Payment Modal
+    // =========================
+
+    const paymentModal =
+        document.getElementById('paymentModal');
+
+
+    function openPaymentDetails(payment) {
+
+        document.getElementById('detailPaymentId').textContent =
+            payment.paymentId ?? '-';
+
+        document.getElementById('detailSessionId').textContent =
+            payment.sessionId ?? '-';
+
+        document.getElementById('detailAmount').textContent =
+            formatAmount(payment.amount);
+
+        document.getElementById('detailMethod').textContent =
+            payment.paymentMethod ?? '-';
+
+        document.getElementById('detailPaidAt').textContent =
+            String(payment.paidAt ?? '').replace('T', ' ') || '-';
+
+        const statusElement =
+            document.getElementById('detailStatus');
+
+        statusElement.textContent =
+            payment.paymentStatus ?? 'UNKNOWN';
+
+        statusElement.className =
+            'payment-detail-status status-' +
+            String(payment.paymentStatus ?? 'unknown').toLowerCase();
+
+        paymentModal.classList.add('show');
+
+        paymentModal.setAttribute('aria-hidden', 'false');
+
+        document.getElementById('closeModalButton').focus();
+    }
+
+
+    // =========================
+    // Close Modal
+    // =========================
+
+    function closePaymentModal() {
+
+        paymentModal.classList.remove('show');
+
+        paymentModal.setAttribute('aria-hidden', 'true');
+    }
+
+
+    document.getElementById('closeModalButton')
+        .addEventListener('click', closePaymentModal);
+
+
+    document.getElementById('closeDetailsButton')
+        .addEventListener('click', closePaymentModal);
+
+
+    // Close when clicking outside the modal
+    paymentModal.addEventListener('click', function(event) {
+
+        if (event.target === paymentModal) {
+            closePaymentModal();
+        }
+
+    });
+
+
+    // Close with Escape key
+    document.addEventListener('keydown', function(event) {
+
+        if (
+            event.key === 'Escape' &&
+            paymentModal.classList.contains('show')
+        ) {
+            closePaymentModal();
+        }
+
+    });
+
+
+    // =========================
+    // Load Payments
+    // =========================
 
     async function loadPayments() {
 
@@ -104,10 +709,13 @@
                 `Total Payments: ${payments.length}`;
 
             paymentList.replaceChildren();
+
             errorMessage.textContent = '';
+
             paymentTotal.textContent = '';
 
             if (payments.length === 0) {
+
                 paymentList.textContent =
                     'No payments available.';
 
@@ -148,6 +756,7 @@
                 th.textContent = headerText;
 
                 headerRow.appendChild(th);
+
             });
 
             thead.appendChild(headerRow);
@@ -168,7 +777,7 @@
                     formatAmount(payment.amount),
                     payment.paymentMethod,
                     payment.paymentStatus,
-                    String(payment.paidAt || '').replace('T', ' ')
+                    String(payment.paidAt ?? '').replace('T', ' ')
                 ];
 
                 values.forEach((value, index) => {
@@ -178,16 +787,30 @@
 
                     if (index === 4) {
 
-                        const status =
-                            document.createElement('span');
+                        const statusButton =
+                            document.createElement('button');
 
-                        status.className =
-                            'payment-status status-' +
-                            String(value).toLowerCase();
+                        statusButton.type = 'button';
 
-                        status.textContent = value || 'UNKNOWN';
+                        statusButton.className =
+                            'payment-status payment-detail-trigger status-' +
+                            String(value ?? 'unknown').toLowerCase();
 
-                        td.appendChild(status);
+                        statusButton.textContent =
+                            value ?? 'UNKNOWN';
+
+                        statusButton.setAttribute(
+                            'aria-label',
+                            `View details for payment ${payment.paymentId}`
+                        );
+
+                        statusButton.addEventListener('click', function() {
+
+                            openPaymentDetails(payment);
+
+                        });
+
+                        td.appendChild(statusButton);
 
                     } else {
 
@@ -196,14 +819,17 @@
                     }
 
                     row.appendChild(td);
+
                 });
 
                 totalAmount += Number(payment.amount) || 0;
 
                 tbody.appendChild(row);
+
             });
 
             table.appendChild(thead);
+
             table.appendChild(tbody);
 
             tableContainer.appendChild(table);
@@ -230,10 +856,22 @@
             errorMessage.textContent =
                 'Failed to load payment data. Please try again later.';
         }
+
     }
 
-    // Load payment data when the page opens
-    loadPayments();
+
+    // =========================
+    // Initial Load
+    // =========================
+
+    async function initializePaymentPage() {
+
+        await loadOccupiedTables();
+
+        await loadPayments();
+    }
+
+    initializePaymentPage();
 
 </script>
 

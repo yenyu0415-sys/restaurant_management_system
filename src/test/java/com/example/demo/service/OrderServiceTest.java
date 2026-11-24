@@ -1,3 +1,4 @@
+
 package com.example.demo.service;
 
 import com.example.demo.dto.CreateOrderRequest;
@@ -29,6 +30,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -54,15 +56,17 @@ class OrderServiceTest {
     private OrderService orderService;
 
 
+    // ==========================================
+    // CREATE ORDER TESTS
+    // ==========================================
+
     // Test 1: Empty order items
     @Test
     void createOrder_WhenItemsAreEmpty_ShouldThrowException() {
 
-        // Arrange
         CreateOrderRequest request = new CreateOrderRequest();
         request.setItems(Collections.emptyList());
 
-        // Act & Assert
         assertThrows(
                 IllegalArgumentException.class,
                 () -> orderService.createOrder(request)
@@ -74,11 +78,9 @@ class OrderServiceTest {
     @Test
     void createOrder_WhenItemsAreNull_ShouldThrowException() {
 
-        // Arrange
         CreateOrderRequest request = new CreateOrderRequest();
         request.setItems(null);
 
-        // Act & Assert
         assertThrows(
                 IllegalArgumentException.class,
                 () -> orderService.createOrder(request)
@@ -90,7 +92,6 @@ class OrderServiceTest {
     @Test
     void createOrder_WhenDiningSessionNotFound_ShouldThrowException() {
 
-        // Arrange
         CreateOrderRequest request = new CreateOrderRequest();
         request.setSessionId(1L);
         request.setEmployeeId(1L);
@@ -104,7 +105,6 @@ class OrderServiceTest {
         when(diningSessionRepository.findById(1L))
                 .thenReturn(Optional.empty());
 
-        // Act & Assert
         assertThrows(
                 RuntimeException.class,
                 () -> orderService.createOrder(request)
@@ -116,7 +116,6 @@ class OrderServiceTest {
     @Test
     void createOrder_WhenDiningSessionIsCompleted_ShouldThrowException() {
 
-        // Arrange
         CreateOrderRequest request = new CreateOrderRequest();
         request.setSessionId(1L);
         request.setEmployeeId(1L);
@@ -134,17 +133,17 @@ class OrderServiceTest {
         when(diningSessionRepository.findById(1L))
                 .thenReturn(Optional.of(diningSession));
 
-        // Act & Assert
         assertThrows(
                 IllegalArgumentException.class,
                 () -> orderService.createOrder(request)
         );
     }
 
+
+    // Test 5: Employee is inactive
     @Test
     void createOrder_WhenEmployeeIsInactive_ShouldThrowException() {
 
-        // given
         CreateOrderRequest request = new CreateOrderRequest();
         request.setSessionId(1L);
         request.setEmployeeId(1L);
@@ -162,15 +161,17 @@ class OrderServiceTest {
         when(employeeRepository.findById(1L))
                 .thenReturn(Optional.of(employee));
 
-        // when & then
-        assertThrows(IllegalArgumentException.class,
-                () -> orderService.createOrder(request));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> orderService.createOrder(request)
+        );
     }
 
+
+    // Test 6: Employee not found
     @Test
     void createOrder_WhenEmployeeNotFound_ShouldThrowException() {
 
-        // given
         CreateOrderRequest request = new CreateOrderRequest();
         request.setSessionId(1L);
         request.setEmployeeId(1L);
@@ -185,15 +186,17 @@ class OrderServiceTest {
         when(employeeRepository.findById(1L))
                 .thenReturn(Optional.empty());
 
-        // when & then
-        assertThrows(RuntimeException.class,
-                () -> orderService.createOrder(request));
+        assertThrows(
+                RuntimeException.class,
+                () -> orderService.createOrder(request)
+        );
     }
 
+
+    // Test 7: Negative quantity
     @Test
     void createOrder_WhenQuantityIsNegative_ShouldThrowException() {
 
-        // given
         CreateOrderRequest request = new CreateOrderRequest();
         request.setSessionId(1L);
         request.setEmployeeId(1L);
@@ -216,14 +219,17 @@ class OrderServiceTest {
         when(employeeRepository.findById(1L))
                 .thenReturn(Optional.of(employee));
 
-        // when & then
-        assertThrows(IllegalArgumentException.class,
-                () -> orderService.createOrder(request));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> orderService.createOrder(request)
+        );
     }
+
+
+    // Test 8: Zero quantity
     @Test
     void createOrder_WhenQuantityIsZero_ShouldThrowException() {
 
-        // given
         CreateOrderRequest request = new CreateOrderRequest();
         request.setSessionId(1L);
         request.setEmployeeId(1L);
@@ -246,14 +252,17 @@ class OrderServiceTest {
         when(employeeRepository.findById(1L))
                 .thenReturn(Optional.of(employee));
 
-        // when & then
-        assertThrows(IllegalArgumentException.class,
-                () -> orderService.createOrder(request));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> orderService.createOrder(request)
+        );
     }
+
+
+    // Test 9: Menu not found
     @Test
     void createOrder_WhenMenuNotFound_ShouldThrowException() {
 
-        // given
         CreateOrderRequest request = new CreateOrderRequest();
         request.setSessionId(1L);
         request.setEmployeeId(1L);
@@ -279,16 +288,17 @@ class OrderServiceTest {
         when(menuRepositoryJPA.findById(1L))
                 .thenReturn(Optional.empty());
 
-        // when & then
-        assertThrows(RuntimeException.class,
-                () -> orderService.createOrder(request));
-
+        assertThrows(
+                RuntimeException.class,
+                () -> orderService.createOrder(request)
+        );
     }
 
+
+    // Test 10: Menu is inactive
     @Test
     void createOrder_WhenMenuIsInactive_ShouldThrowException() {
 
-        // given
         CreateOrderRequest request = new CreateOrderRequest();
         request.setSessionId(1L);
         request.setEmployeeId(1L);
@@ -318,15 +328,21 @@ class OrderServiceTest {
         when(menuRepositoryJPA.findById(1L))
                 .thenReturn(Optional.of(menu));
 
-        // when & then
-        assertThrows(IllegalArgumentException.class,
-                () -> orderService.createOrder(request));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> orderService.createOrder(request)
+        );
     }
 
+
+    // ==========================================
+    // UPDATE ORDER STATUS TESTS
+    // ==========================================
+
+    // Test 11: Null status
     @Test
     void updateOrderStatus_WhenStatusIsNull_ShouldThrowException() {
 
-        // given
         Long orderId = 1L;
 
         Order order = new Order();
@@ -335,15 +351,17 @@ class OrderServiceTest {
         when(orderRepository.findById(orderId))
                 .thenReturn(Optional.of(order));
 
-        // when & then
-        assertThrows(IllegalArgumentException.class,
-                () -> orderService.updateOrderStatus(orderId, null));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> orderService.updateOrderStatus(orderId, null)
+        );
     }
 
+
+    // Test 12: PENDING -> PREPARING
     @Test
     void updateOrderStatus_WhenPending_ShouldChangeToPreparing() {
 
-        // given
         Long orderId = 1L;
 
         Order order = new Order();
@@ -355,19 +373,22 @@ class OrderServiceTest {
         when(orderRepository.save(any(Order.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        // when
         Order result = orderService.updateOrderStatus(
-                orderId, OrderStatus.PREPARING
+                orderId,
+                OrderStatus.PREPARING
         );
 
-        // then
-        assertEquals(OrderStatus.PREPARING, result.getStatus());
+        assertEquals(
+                OrderStatus.PREPARING,
+                result.getStatus()
+        );
     }
 
+
+    // Test 13: PREPARING -> COMPLETED
     @Test
     void updateOrderStatus_WhenPreparing_ShouldChangeToCompleted() {
 
-        // given
         Long orderId = 1L;
 
         Order order = new Order();
@@ -379,19 +400,22 @@ class OrderServiceTest {
         when(orderRepository.save(any(Order.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        // when
         Order result = orderService.updateOrderStatus(
-                orderId, OrderStatus.COMPLETED
+                orderId,
+                OrderStatus.COMPLETED
         );
 
-        // then
-        assertEquals(OrderStatus.COMPLETED, result.getStatus());
+        assertEquals(
+                OrderStatus.COMPLETED,
+                result.getStatus()
+        );
     }
 
+
+    // Test 14: Invalid status transition
     @Test
     void updateOrderStatus_WhenInvalidTransition_ShouldThrowException() {
 
-        // given
         Long orderId = 1L;
 
         Order order = new Order();
@@ -400,25 +424,175 @@ class OrderServiceTest {
         when(orderRepository.findById(orderId))
                 .thenReturn(Optional.of(order));
 
-        // when & then
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(
+                IllegalArgumentException.class,
                 () -> orderService.updateOrderStatus(
-                        orderId, OrderStatus.COMPLETED
-                ));
+                        orderId,
+                        OrderStatus.COMPLETED
+                )
+        );
     }
+
+
+    // Test 15: Order not found
     @Test
     void updateOrderStatus_WhenOrderNotFound_ShouldThrowException() {
 
-        // given
         Long orderId = 999L;
 
         when(orderRepository.findById(orderId))
                 .thenReturn(Optional.empty());
 
-        // when & then
-        assertThrows(RuntimeException.class,
+        assertThrows(
+                RuntimeException.class,
                 () -> orderService.updateOrderStatus(
-                        orderId, OrderStatus.PREPARING
-                ));
+                        orderId,
+                        OrderStatus.PREPARING
+                )
+        );
     }
+
+
+    // ==========================================
+    // CANCEL ORDER TESTS
+    // ==========================================
+
+    // Test 16: Cancel PENDING order
+    @Test
+    void cancelOrder_WhenPending_ShouldChangeToCancelled() {
+
+        Long orderId = 1L;
+
+        Order order = new Order();
+        order.setStatus(OrderStatus.PENDING);
+
+        when(orderRepository.findById(orderId))
+                .thenReturn(Optional.of(order));
+
+        when(orderRepository.save(any(Order.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Order result = orderService.cancelOrder(orderId);
+
+        assertEquals(
+                OrderStatus.CANCELLED,
+                result.getStatus()
+        );
     }
+
+
+    // Test 17: Cancel PREPARING order
+    @Test
+    void cancelOrder_WhenPreparing_ShouldChangeToCancelled() {
+
+        Long orderId = 1L;
+
+        Order order = new Order();
+        order.setStatus(OrderStatus.PREPARING);
+
+        when(orderRepository.findById(orderId))
+                .thenReturn(Optional.of(order));
+
+        when(orderRepository.save(any(Order.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Order result = orderService.cancelOrder(orderId);
+
+        assertEquals(
+                OrderStatus.CANCELLED,
+                result.getStatus()
+        );
+    }
+
+
+    // Test 18: Cannot cancel COMPLETED order
+    @Test
+    void cancelOrder_WhenCompleted_ShouldThrowException() {
+
+        Long orderId = 1L;
+
+        Order order = new Order();
+        order.setStatus(OrderStatus.COMPLETED);
+
+        when(orderRepository.findById(orderId))
+                .thenReturn(Optional.of(order));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> orderService.cancelOrder(orderId)
+        );
+    }
+
+
+    // Test 19: Cannot cancel CANCELLED order again
+    @Test
+    void cancelOrder_WhenAlreadyCancelled_ShouldThrowException() {
+
+        Long orderId = 1L;
+
+        Order order = new Order();
+        order.setStatus(OrderStatus.CANCELLED);
+
+        when(orderRepository.findById(orderId))
+                .thenReturn(Optional.of(order));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> orderService.cancelOrder(orderId)
+        );
+    }
+
+
+    // Test 20: Order not found when cancelling
+    @Test
+    void cancelOrder_WhenOrderNotFound_ShouldThrowException() {
+
+        Long orderId = 999L;
+
+        when(orderRepository.findById(orderId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                RuntimeException.class,
+                () -> orderService.cancelOrder(orderId)
+        );
+    }
+
+
+    // ==========================================
+    // ADDITIONAL VALIDATION TEST
+    // ==========================================
+
+    // Test 21: Null quantity
+    @Test
+    void createOrder_WhenQuantityIsNull_ShouldThrowException() {
+
+        CreateOrderRequest request = new CreateOrderRequest();
+        request.setSessionId(1L);
+        request.setEmployeeId(1L);
+
+        OrderItemRequest itemRequest = new OrderItemRequest();
+        itemRequest.setMenuId(1L);
+        itemRequest.setQuantity(null);
+
+        request.setItems(List.of(itemRequest));
+
+        DiningSession diningSession = new DiningSession();
+        diningSession.setStatus(DiningSessionStatus.ACTIVE);
+
+        Employee employee = new Employee();
+        employee.setActive(true);
+
+        when(diningSessionRepository.findById(1L))
+                .thenReturn(Optional.of(diningSession));
+
+        when(employeeRepository.findById(1L))
+                .thenReturn(Optional.of(employee));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> orderService.createOrder(request)
+        );
+    }
+
+}

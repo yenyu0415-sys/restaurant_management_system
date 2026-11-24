@@ -1,3 +1,4 @@
+
 package com.example.demo.controller;
 
 import com.example.demo.entity.DiningSession;
@@ -28,6 +29,15 @@ public class DiningSessionController {
     @GetMapping("/{id}")
     public DiningSession getSessionById(@PathVariable Long id) {
         return diningSessionService.getSessionById(id);
+    }
+
+    // 테이블 ID로 현재 활성 세션 조회
+    @GetMapping("/active/table/{tableId}")
+    public DiningSession getActiveSessionByTableId(
+            @PathVariable Long tableId) {
+
+        return diningSessionService
+                .getActiveSessionByTableId(tableId);
     }
 
     // 식사 세션 시작

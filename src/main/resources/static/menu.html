@@ -24,7 +24,7 @@
     <!-- Navigation -->
     <nav>
         <a href="/index.html">Dashboard</a>
-        <a href="/menu.html" class="active">Menu</a>
+        <a href="/menu.html" class="active" aria-current="page">Menu</a>
         <a href="/tables.html">Tables</a>
         <a href="/orders.html">Orders</a>
         <a href="/payments.html">Payments</a>
@@ -50,26 +50,31 @@
 
             <h3>Add New Menu</h3>
 
+            <label for="menuName">Menu Name</label>
             <input
                     type="text"
                     id="menuName"
                     placeholder="Menu Name"
+                    maxlength="100"
                     required
             >
 
+            <label for="category">Category</label>
             <input
                     type="text"
                     id="category"
                     placeholder="Category"
+                    maxlength="50"
                     required
             >
 
+            <label for="price">Price</label>
             <input
                     type="number"
                     id="price"
                     placeholder="Price"
                     min="1"
-                    step="0.01"
+                    step="1"
                     required
             >
 
@@ -84,11 +89,11 @@
 
             <thead>
             <tr>
-                <th>Menu Name</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th scope="col">Menu Name</th>
+                <th scope="col">Category</th>
+                <th scope="col">Price</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
             </tr>
             </thead>
 

@@ -44,7 +44,7 @@ public class PaymentService {
         this.diningTableRepository = diningTableRepository;
     }
 
-    // 전체 결제 내역 조회
+    // Get All Payments
     @Transactional(readOnly = true)
     public List<PaymentResponse> getAllPayments() {
 
@@ -61,39 +61,46 @@ public class PaymentService {
                 .toList();
     }
 
-    // 결제 생성 및 식사 세션 종료
+    // Create Payment and Complete Dining Session
     @Transactional
     public Payment createPayment(Long sessionId, String paymentMethod) {
 
-        // 1. 식사 세션 조회
+        // 1. Find Dining Session
         DiningSession diningSession =
                 diningSessionRepository.findById(sessionId)
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Dining session not found"));
 
-        // 2. 중복 결제 확인
+        // 2. Check Duplicate Payment
         if (paymentRepository.existsByDiningSession(diningSession)) {
             throw new IllegalArgumentException(
                     "Payment already exists");
         }
 
-        // 3. 세션 상태 확인
+        // 3. Check Dining Session Status
         if (diningSession.getStatus() != DiningSessionStatus.ACTIVE) {
             throw new IllegalArgumentException(
                     "Dining session is not active");
         }
 
-        // 4. 결제 수단 확인
+        // 4. Validate Payment Method
+        if (paymentMethod == null || paymentMethod.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Invalid payment method");
+        }
+
+        paymentMethod = paymentMethod.trim().toUpperCase();
+
         if (!"CASH".equals(paymentMethod)
-                && !"CREDIT_CARD".equals(paymentMethod)
-                && !"MOBILE_PAYMENT".equals(paymentMethod)) {
+                && !"CARD".equals(paymentMethod)
+                && !"MOBILE_PAY".equals(paymentMethod)) {
 
             throw new IllegalArgumentException(
                     "Invalid payment method");
         }
 
-        // 5. 미처리 주문 확인
+        // 5. Check Unfinished Orders
         boolean hasUnfinishedOrders =
                 orderRepository.existsByDiningSession_SessionIdAndStatusIn(
                         sessionId,
@@ -108,7 +115,7 @@ public class PaymentService {
                     "Unfinished orders exist. Please check the orders before payment.");
         }
 
-        // 6. 취소되지 않은 주문 금액 계산
+        // 6. Calculate Amount Excluding Cancelled Orders
         BigDecimal totalAmount =
                 orderItemRepository.calculateTotalAmount(
                         sessionId,
@@ -122,23 +129,23 @@ public class PaymentService {
                     "Order amount must be greater than zero");
         }
 
-        // 7. DiningTable 조회
+        // 7. Find Dining Table
         DiningTable diningTable =
                 diningTableRepository.findById(diningSession.getTableId())
                         .orElseThrow(() ->
                                 new RuntimeException(
                                         "Dining table not found"));
 
-        // 8. 테이블 상태 확인
+        // 8. Check Dining Table Status
         if (!"OCCUPIED".equals(diningTable.getStatus())) {
             throw new IllegalArgumentException(
                     "Dining table is not occupied");
         }
 
-        // 9. 현재 시간 설정
+        // 9. Set Current Time
         LocalDateTime now = LocalDateTime.now();
 
-        // 10. 결제 생성
+        // 10. Create Payment
         Payment payment = new Payment();
 
         payment.setDiningSession(diningSession);
@@ -150,11 +157,11 @@ public class PaymentService {
         Payment savedPayment =
                 paymentRepository.saveAndFlush(payment);
 
-        // 11. DiningSession 종료
+        // 11. Complete Dining Session
         diningSession.setStatus(DiningSessionStatus.COMPLETED);
         diningSession.setEndedAt(now);
 
-        // 12. DiningTable 사용 가능 상태로 변경
+        // 12. Make Dining Table Available
         diningTable.setStatus("AVAILABLE");
 
         return savedPayment;

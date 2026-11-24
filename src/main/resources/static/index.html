@@ -20,7 +20,7 @@
 
     <!-- Navigation -->
     <nav>
-        <a href="/index.html" class="active">Dashboard</a>
+        <a href="/index.html" class="active" aria-current="page">Dashboard</a>
         <a href="/menu.html">Menu</a>
         <a href="/tables.html">Tables</a>
         <a href="/orders.html">Orders</a>
@@ -38,33 +38,54 @@
     </section>
 
     <!-- Dashboard Cards -->
-    <section class="dashboard-cards">
+    <section class="dashboard-cards" aria-label="Restaurant Summary">
 
         <!-- Total Tables -->
         <div class="card">
-            <div class="card-icon">▦</div>
+            <div class="card-icon" aria-hidden="true">▦</div>
+
             <h3>Total Tables</h3>
-            <p class="card-value">4</p>
+
+            <p class="card-value"
+               id="totalTables"
+               aria-live="polite">Loading...</p>
+
             <p class="card-description">Restaurant Tables</p>
         </div>
 
         <!-- Active Orders -->
         <div class="card">
-            <div class="card-icon">☷</div>
+            <div class="card-icon" aria-hidden="true">☷</div>
+
             <h3>Active Orders</h3>
-            <p class="card-value">6</p>
+
+            <p class="card-value"
+               id="activeOrders"
+               aria-live="polite">Loading...</p>
+
             <p class="card-description">Current Orders</p>
         </div>
 
         <!-- Today's Payments -->
         <div class="card">
-            <div class="card-icon">$</div>
+            <div class="card-icon" aria-hidden="true">$</div>
+
             <h3>Today's Payments</h3>
-            <p class="card-value">0.00</p>
+
+            <p class="card-value"
+               id="todayPayments"
+               aria-live="polite">Loading...</p>
+
             <p class="card-description">Daily Payment Summary</p>
         </div>
 
     </section>
+
+    <!-- Dashboard Error Message -->
+    <p id="dashboardError"
+       class="card-description"
+       role="alert"
+       hidden></p>
 
 </main>
 

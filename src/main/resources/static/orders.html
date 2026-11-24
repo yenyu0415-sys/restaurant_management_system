@@ -7,18 +7,52 @@
 
     <title>Order Management</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" href="/css/style.css?v=3">
+
+    <style>
+        /* =========================
+           Order Status Actions
+        ========================= */
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .order-action-button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            background-color: #e68a27;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .order-action-button:hover {
+            background-color: #cf7418;
+        }
+
+        .order-action-button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        .order-action-message {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #dc3545;
+        }
+    </style>
 </head>
 
 <body>
 
-<!-- Header -->
 <header>
     <h1>Restaurant Management System</h1>
     <p>Staff Management Dashboard</p>
 
-    <!-- Navigation -->
     <nav>
         <a href="/index.html">Dashboard</a>
         <a href="/menu.html">Menu</a>
@@ -28,7 +62,6 @@
     </nav>
 </header>
 
-<!-- Main Content -->
 <main>
 
     <!-- Page Title -->
@@ -39,6 +72,7 @@
 
     <!-- Order List -->
     <section class="welcome-section">
+
         <h2>Order List</h2>
 
         <p id="orderCount">Loading orders...</p>
@@ -47,18 +81,24 @@
             Loading...
         </div>
 
-        <p id="errorMessage"
-           class="order-error"
-           role="alert"></p>
+        <p
+                id="errorMessage"
+                class="order-error"
+                role="alert">
+        </p>
+
     </section>
 
 </main>
 
-<!-- JavaScript -->
 <script>
 
-    // Format money without assuming a currency
+    // =========================
+    // Format Amount
+    // =========================
+
     function formatAmount(amount) {
+
         const value = Number(amount);
 
         if (!Number.isFinite(value)) {
@@ -68,7 +108,74 @@
         return value.toFixed(2);
     }
 
-    // Load orders from Backend API
+
+    // =========================
+    // Update Order Status
+    // =========================
+
+    async function updateOrderStatus(orderId, nextStatus, button) {
+
+        const confirmed = confirm(
+            `Change Order #${orderId} to ${nextStatus}?`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = 'Updating...';
+
+        try {
+
+            const response = await fetch(
+                `/orders/${orderId}/status?status=${encodeURIComponent(nextStatus)}`,
+                {
+                    method: 'PATCH'
+                }
+            );
+
+            if (!response.ok) {
+
+                let errorText = 'Failed to update order status.';
+
+                try {
+                    const errorData = await response.json();
+
+                    if (errorData.message) {
+                        errorText = errorData.message;
+                    }
+                } catch (error) {
+                    // Use default error message.
+                }
+
+                throw new Error(errorText);
+            }
+
+            alert(`Order #${orderId} updated to ${nextStatus}.`);
+
+            await loadOrders();
+
+        } catch (error) {
+
+            console.error('Order status update error:', error);
+
+            alert(error.message);
+
+            button.disabled = false;
+
+            button.textContent =
+                nextStatus === 'PREPARING'
+                    ? 'Start Preparing'
+                    : 'Complete Order';
+        }
+    }
+
+
+    // =========================
+    // Load Orders
+    // =========================
+
     async function loadOrders() {
 
         const orderList =
@@ -98,6 +205,8 @@
                 `Total Orders: ${orders.length}`;
 
             orderList.replaceChildren();
+
+            errorMessage.textContent = '';
 
             if (orders.length === 0) {
 
@@ -224,11 +333,72 @@
                 total.textContent =
                     `Total: ${formatAmount(order.totalAmount)}`;
 
+                // Order Status Actions
+                const actions =
+                    document.createElement('div');
+
+                actions.className = 'order-actions';
+
+                if (order.status === 'PENDING') {
+
+                    const preparingButton =
+                        document.createElement('button');
+
+                    preparingButton.type = 'button';
+
+                    preparingButton.className =
+                        'order-action-button';
+
+                    preparingButton.textContent =
+                        'Start Preparing';
+
+                    preparingButton.addEventListener('click', function() {
+
+                        updateOrderStatus(
+                            order.orderId,
+                            'PREPARING',
+                            preparingButton
+                        );
+
+                    });
+
+                    actions.appendChild(preparingButton);
+
+                } else if (order.status === 'PREPARING') {
+
+                    const completedButton =
+                        document.createElement('button');
+
+                    completedButton.type = 'button';
+
+                    completedButton.className =
+                        'order-action-button';
+
+                    completedButton.textContent =
+                        'Complete Order';
+
+                    completedButton.addEventListener('click', function() {
+
+                        updateOrderStatus(
+                            order.orderId,
+                            'COMPLETED',
+                            completedButton
+                        );
+
+                    });
+
+                    actions.appendChild(completedButton);
+                }
+
                 // Add Elements
                 card.appendChild(header);
                 card.appendChild(info);
                 card.appendChild(itemsSection);
                 card.appendChild(total);
+
+                if (actions.children.length > 0) {
+                    card.appendChild(actions);
+                }
 
                 orderGrid.appendChild(card);
             });
@@ -237,10 +407,7 @@
 
         } catch (error) {
 
-            console.error(
-                'Order loading error:',
-                error
-            );
+            console.error('Order loading error:', error);
 
             orderCount.textContent =
                 'Unable to load orders.';
@@ -252,7 +419,11 @@
         }
     }
 
-    // Load orders when the page opens
+
+    // =========================
+    // Initial Load
+    // =========================
+
     loadOrders();
 
 </script>

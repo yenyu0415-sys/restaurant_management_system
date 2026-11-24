@@ -1,3 +1,4 @@
+
 package com.example.demo.service;
 
 import com.example.demo.entity.DiningSession;
@@ -39,6 +40,21 @@ public class DiningSessionService {
                 .orElseThrow(() ->
                         new RuntimeException(
                                 "Dining session not found: " + id));
+    }
+
+    // 테이블 ID로 현재 활성 세션 조회
+    public DiningSession getActiveSessionByTableId(Long tableId) {
+
+        return diningSessionRepository
+                .findByTableIdAndStatus(
+                        tableId,
+                        DiningSessionStatus.ACTIVE
+                )
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "No active session found for table: " + tableId
+                        )
+                );
     }
 
     // 식사 세션 시작

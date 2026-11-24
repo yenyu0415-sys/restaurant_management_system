@@ -7,37 +7,40 @@
 
     <title>Menu Management</title>
 
-    <!-- Connect CSS -->
-    <link rel="stylesheet" href="/css/style.css">
+    <!-- Common CSS -->
+    <link rel="stylesheet" href="/css/style.css?v=5">
 
-    <!-- Connect Menu JavaScript -->
+    <!-- Menu JavaScript -->
     <script src="/js/menu.js" defer></script>
 </head>
 
 <body>
 
+<!-- Header -->
 <header>
     <h1>Restaurant Management System</h1>
     <p>Staff Management Dashboard</p>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="/index.html">Dashboard</a>
+        <a href="/menu.html" class="active">Menu</a>
+        <a href="/tables.html">Tables</a>
+        <a href="/orders.html">Orders</a>
+        <a href="/payments.html">Payments</a>
+    </nav>
 </header>
 
-<nav>
-    <ul>
-        <li><a href="/index.html">Dashboard</a></li>
-        <li><a href="/menu.html">Menu</a></li>
-        <li><a href="/tables.html">Tables</a></li>
-        <li><a href="/orders.html">Orders</a></li>
-        <li><a href="/payments.html">Payments</a></li>
-    </ul>
-</nav>
-
+<!-- Main Content -->
 <main>
 
+    <!-- Page Header -->
     <section class="welcome-section">
         <h2>Menu Management</h2>
         <p>Manage restaurant menu items here.</p>
     </section>
 
+    <!-- Menu Management -->
     <section class="welcome-section">
 
         <h2>Menu List</h2>
@@ -66,10 +69,13 @@
                     id="price"
                     placeholder="Price"
                     min="1"
+                    step="0.01"
                     required
             >
 
-            <button type="submit">Add Menu</button>
+            <button type="submit">
+                Add Menu
+            </button>
 
         </form>
 
@@ -87,7 +93,7 @@
             </thead>
 
             <tbody id="menuTableBody">
-            <!-- Menu data will be inserted here -->
+            <!-- Menu data loaded by menu.js -->
             </tbody>
 
         </table>

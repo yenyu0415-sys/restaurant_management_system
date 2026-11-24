@@ -7,14 +7,18 @@
 
     <title>Table Management</title>
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="/css/style.css?v=2">
+    <!-- Common CSS -->
+    <link rel="stylesheet" href="/css/style.css?v=5">
 </head>
+
 <body>
 
+<!-- Header -->
 <header>
     <h1>Restaurant Management System</h1>
+    <p>Staff Management Dashboard</p>
 
+    <!-- Navigation -->
     <nav>
         <a href="/index.html">Dashboard</a>
         <a href="/menu.html">Menu</a>
@@ -24,6 +28,7 @@
     </nav>
 </header>
 
+<!-- Main Content -->
 <main class="table-page">
 
     <!-- Page Header -->
@@ -41,8 +46,8 @@
     <!-- Message -->
     <div id="message" class="table-message"></div>
 
-    <!-- Summary -->
-    <div class="table-summary">
+    <!-- Table Summary -->
+    <section class="table-summary">
 
         <div class="summary-card">
             <h3>Total Tables</h3>
@@ -59,15 +64,17 @@
             <p id="occupiedCount">0</p>
         </div>
 
-    </div>
+    </section>
 
     <!-- Restaurant Tables -->
     <section class="table-section">
+
         <h3>Restaurant Tables</h3>
 
         <div id="tableList" class="table-grid">
             <p>Loading tables...</p>
         </div>
+
     </section>
 
 </main>

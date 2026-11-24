@@ -7,95 +7,37 @@
 
     <title>Payment Management</title>
 
-    <link rel="stylesheet" href="/css/style.css">
-
-    <style>
-        .payment-table-container {
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-
-        .payment-table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #ffffff;
-        }
-
-        .payment-table th,
-        .payment-table td {
-            padding: 14px;
-            border-bottom: 1px solid #e0e0e0;
-            text-align: left;
-            white-space: nowrap;
-        }
-
-        .payment-table th {
-            background-color: #263547;
-            color: white;
-        }
-
-        .payment-table tr:hover {
-            background-color: #f4f6f9;
-        }
-
-        .payment-status {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .status-completed {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .payment-total {
-            margin-top: 20px;
-            text-align: right;
-            font-size: 20px;
-            font-weight: bold;
-            color: #263547;
-        }
-
-        .payment-error {
-            color: #dc3545;
-            font-weight: bold;
-            margin-top: 15px;
-        }
-
-        .payment-empty {
-            padding: 20px 0;
-            color: #666;
-        }
-    </style>
+    <!-- Common CSS -->
+    <link rel="stylesheet" href="/css/style.css?v=6">
 </head>
 
 <body>
 
+<!-- Header -->
 <header>
     <h1>Restaurant Management System</h1>
     <p>Staff Management Dashboard</p>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="/index.html">Dashboard</a>
+        <a href="/menu.html">Menu</a>
+        <a href="/tables.html">Tables</a>
+        <a href="/orders.html">Orders</a>
+        <a href="/payments.html" class="active">Payments</a>
+    </nav>
 </header>
 
-<nav>
-    <ul>
-        <li><a href="/index.html">Dashboard</a></li>
-        <li><a href="/menu.html">Menu</a></li>
-        <li><a href="/tables.html">Tables</a></li>
-        <li><a href="/orders.html">Orders</a></li>
-        <li><a href="/payments.html">Payments</a></li>
-    </ul>
-</nav>
-
+<!-- Main Content -->
 <main>
 
+    <!-- Page Header -->
     <section class="welcome-section">
         <h2>Payment Management</h2>
         <p>Manage restaurant payments here.</p>
     </section>
 
+    <!-- Payment List -->
     <section class="welcome-section">
 
         <h2>Payment List</h2>
@@ -117,6 +59,7 @@
 
 </main>
 
+<!-- JavaScript -->
 <script>
 
     function formatAmount(amount) {
@@ -296,4 +239,3 @@
 
 </body>
 </html>
-

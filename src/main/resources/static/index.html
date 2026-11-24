@@ -7,11 +7,8 @@
 
     <title>Restaurant Management System</title>
 
-    <!-- Connect CSS -->
-    <link rel="stylesheet" href="/css/style.css">
-
-    <!-- Connect Dashboard JavaScript -->
-    <script src="/js/dashboard.js" defer></script>
+    <!-- Common CSS -->
+    <link rel="stylesheet" href="/css/style.css?v=5">
 </head>
 
 <body>
@@ -20,18 +17,16 @@
 <header>
     <h1>Restaurant Management System</h1>
     <p>Staff Management Dashboard</p>
-</header>
 
-<!-- Navigation -->
-<nav>
-    <ul>
-        <li><a href="/index.html">Dashboard</a></li>
-        <li><a href="/menu.html">Menu</a></li>
-        <li><a href="/tables.html">Tables</a></li>
-        <li><a href="/orders.html">Orders</a></li>
-        <li><a href="/payments.html">Payments</a></li>
-    </ul>
-</nav>
+    <!-- Navigation -->
+    <nav>
+        <a href="/index.html" class="active">Dashboard</a>
+        <a href="/menu.html">Menu</a>
+        <a href="/tables.html">Tables</a>
+        <a href="/orders.html">Orders</a>
+        <a href="/payments.html">Payments</a>
+    </nav>
+</header>
 
 <!-- Main Content -->
 <main>
@@ -45,42 +40,36 @@
     <!-- Dashboard Cards -->
     <section class="dashboard-cards">
 
-        <!-- Total Tables Card -->
+        <!-- Total Tables -->
         <div class="card">
-            <div class="card-icon table-icon" aria-hidden="true">
-                ▦
-            </div>
-
+            <div class="card-icon">▦</div>
             <h3>Total Tables</h3>
-            <p class="card-value" id="totalTables">—</p>
+            <p class="card-value">4</p>
             <p class="card-description">Restaurant Tables</p>
         </div>
 
-        <!-- Active Orders Card -->
+        <!-- Active Orders -->
         <div class="card">
-            <div class="card-icon order-icon" aria-hidden="true">
-                ☷
-            </div>
-
+            <div class="card-icon">☷</div>
             <h3>Active Orders</h3>
-            <p class="card-value" id="activeOrders">—</p>
+            <p class="card-value">6</p>
             <p class="card-description">Current Orders</p>
         </div>
 
-        <!-- Today's Payments Card -->
+        <!-- Today's Payments -->
         <div class="card">
-            <div class="card-icon payment-icon" aria-hidden="true">
-                $
-            </div>
-
+            <div class="card-icon">$</div>
             <h3>Today's Payments</h3>
-            <p class="card-value" id="todayPayments">—</p>
+            <p class="card-value">0.00</p>
             <p class="card-description">Daily Payment Summary</p>
         </div>
 
     </section>
 
 </main>
+
+<!-- JavaScript -->
+<script src="/js/dashboard.js"></script>
 
 </body>
 </html>

@@ -7,142 +7,73 @@
 
     <title>Table Management</title>
 
-    <!-- Connect CSS -->
-    <link rel="stylesheet" href="/css/style.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/style.css?v=2">
 </head>
-
 <body>
 
-<!-- Header -->
 <header>
     <h1>Restaurant Management System</h1>
-    <p>Staff Management Dashboard</p>
+
+    <nav>
+        <a href="/index.html">Dashboard</a>
+        <a href="/menu.html">Menu</a>
+        <a href="/tables.html" class="active">Tables</a>
+        <a href="/orders.html">Orders</a>
+        <a href="/payments.html">Payments</a>
+    </nav>
 </header>
 
-<!-- Navigation -->
-<nav>
-    <ul>
-        <li><a href="/index.html">Dashboard</a></li>
-        <li><a href="/menu.html">Menu</a></li>
-        <li><a href="/tables.html">Tables</a></li>
-        <li><a href="/orders.html">Orders</a></li>
-        <li><a href="/payments.html">Payments</a></li>
-    </ul>
-</nav>
+<main class="table-page">
 
-<!-- Main Content -->
-<main>
-
-    <!-- Page Title -->
-    <section class="welcome-section">
-        <h2>Table Management</h2>
-        <p>Manage restaurant tables here.</p>
-    </section>
-
-    <!-- Table List -->
-    <section class="welcome-section">
-        <h2>Table List</h2>
-
-        <p id="tableCount">Loading tables...</p>
-
-        <div id="tableList">
-            Loading...
+    <!-- Page Header -->
+    <div class="table-page-header">
+        <div>
+            <h2>Table Management</h2>
+            <p>Manage restaurant tables and dining sessions.</p>
         </div>
 
-        <p id="errorMessage" role="alert"></p>
+        <button id="refreshButton" class="table-refresh-btn">
+            Refresh
+        </button>
+    </div>
+
+    <!-- Message -->
+    <div id="message" class="table-message"></div>
+
+    <!-- Summary -->
+    <div class="table-summary">
+
+        <div class="summary-card">
+            <h3>Total Tables</h3>
+            <p id="totalCount">0</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Available</h3>
+            <p id="availableCount">0</p>
+        </div>
+
+        <div class="summary-card">
+            <h3>Occupied</h3>
+            <p id="occupiedCount">0</p>
+        </div>
+
+    </div>
+
+    <!-- Restaurant Tables -->
+    <section class="table-section">
+        <h3>Restaurant Tables</h3>
+
+        <div id="tableList" class="table-grid">
+            <p>Loading tables...</p>
+        </div>
     </section>
 
 </main>
 
-<script>
-    async function loadTables() {
-
-        const tableList = document.getElementById('tableList');
-        const tableCount = document.getElementById('tableCount');
-        const errorMessage = document.getElementById('errorMessage');
-
-        try {
-
-            const response = await fetch('/dining-tables');
-
-            if (!response.ok) {
-                throw new Error('Failed to load table data.');
-            }
-
-            const tables = await response.json();
-
-            if (!Array.isArray(tables)) {
-                throw new Error('Invalid table data received.');
-            }
-
-            tableCount.textContent =
-                `Total Tables: ${tables.length}`;
-
-            tableList.innerHTML = '';
-
-            if (tables.length === 0) {
-                tableList.textContent = 'No tables available.';
-                return;
-            }
-
-            const tableContainer = document.createElement('div');
-
-            tableContainer.style.display = 'grid';
-            tableContainer.style.gridTemplateColumns =
-                'repeat(auto-fit, minmax(200px, 1fr))';
-            tableContainer.style.gap = '20px';
-
-            tables.forEach(table => {
-
-                const card = document.createElement('div');
-
-                card.style.backgroundColor = '#ffffff';
-                card.style.padding = '20px';
-                card.style.borderRadius = '10px';
-                card.style.boxShadow =
-                    '0 2px 8px rgba(0, 0, 0, 0.1)';
-
-                const title = document.createElement('h3');
-                title.textContent = table.tableNumber;
-
-                const capacity = document.createElement('p');
-                capacity.textContent =
-                    `Capacity: ${table.capacity} people`;
-
-                const status = document.createElement('p');
-                status.textContent = `Status: ${table.status}`;
-
-                if (table.status === 'AVAILABLE') {
-                    status.style.color = '#269b72';
-                } else if (table.status === 'OCCUPIED') {
-                    status.style.color = '#dc5a5a';
-                }
-
-                status.style.fontWeight = 'bold';
-
-                card.appendChild(title);
-                card.appendChild(capacity);
-                card.appendChild(status);
-
-                tableContainer.appendChild(card);
-            });
-
-            tableList.appendChild(tableContainer);
-
-        } catch (error) {
-
-            console.error('Table loading error:', error);
-
-            tableCount.textContent = 'Unable to load tables.';
-            tableList.textContent = '';
-            errorMessage.textContent =
-                'Failed to load table data. Please try again later.';
-        }
-    }
-
-    // Load table data when the page opens
-    loadTables();
-</script>
+<!-- JavaScript -->
+<script src="/js/tables.js"></script>
 
 </body>
 </html>

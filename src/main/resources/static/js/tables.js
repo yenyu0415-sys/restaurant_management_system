@@ -27,7 +27,6 @@ async function loadTables(preserveMessage = false) {
 
     try {
 
-        // Load tables
         const tableResponse = await fetch(API_URL);
 
         if (!tableResponse.ok) {
@@ -36,7 +35,6 @@ async function loadTables(preserveMessage = false) {
 
         const tables = await tableResponse.json();
 
-        // Load dining sessions
         const sessionResponse = await fetch(SESSION_URL);
 
         if (!sessionResponse.ok) {
@@ -87,7 +85,6 @@ function displayTables(tables, sessions) {
             occupied++;
         }
 
-        // Find active session for this table
         const activeSession = sessions.find(session =>
             Number(session.tableId) === Number(table.tableId) &&
             session.status === "ACTIVE"
@@ -100,8 +97,7 @@ function displayTables(tables, sessions) {
         title.textContent = table.tableNumber;
 
         const capacity = document.createElement("p");
-        capacity.textContent =
-            `Capacity: ${table.capacity} people`;
+        capacity.textContent = `Capacity: ${table.capacity} people`;
 
         const status = document.createElement("p");
         status.textContent = table.status;
@@ -115,7 +111,6 @@ function displayTables(tables, sessions) {
 
         const button = document.createElement("button");
 
-        // Available Table
         if (table.status === "AVAILABLE") {
 
             button.textContent = "Start Session";
@@ -124,10 +119,7 @@ function displayTables(tables, sessions) {
                 startSession(table.tableId, button);
             });
 
-        }
-
-        // Occupied Table
-        else if (table.status === "OCCUPIED" && activeSession) {
+        } else if (table.status === "OCCUPIED" && activeSession) {
 
             button.textContent = "End Session";
 
@@ -135,10 +127,7 @@ function displayTables(tables, sessions) {
                 endSession(activeSession.sessionId, button);
             });
 
-        }
-
-        // Occupied but no active session found
-        else {
+        } else {
 
             button.textContent = "No Active Session";
             button.disabled = true;
@@ -186,16 +175,14 @@ async function startSession(tableId, button) {
         );
 
         if (!response.ok) {
-
             const errorText = await response.text();
-
             throw new Error(
                 errorText || "Failed to start dining session."
             );
         }
 
         showMessage(
-            "Dining session completed successfully!",
+            "Dining session started successfully!",
             "success"
         );
 
@@ -237,16 +224,14 @@ async function endSession(sessionId, button) {
         );
 
         if (!response.ok) {
-
             const errorText = await response.text();
-
             throw new Error(
                 errorText || "Failed to end dining session."
             );
         }
 
         showMessage(
-            "Dining session completed successfully!",
+            "Dining session ended successfully!",
             "success"
         );
 
